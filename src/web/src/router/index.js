@@ -23,6 +23,12 @@ import CSFAFundingRequests from "../components/application/csfa-funding-requests
 import CSFANeedsAssessment from "../components/application/csfa-needs-assessment/CSFANeedsAssessment";
 import Documentation from "../components/application/Documentation";
 
+import CanadianArmyScholarship from "../components/application/csfa-needs-assessment/CanadianArmyScholarship";
+import StudentTrainingAllowance_OtherFundings from "../components/application/csfa-needs-assessment/StudentTrainingAllowance-OtherFundings";
+import YukonGrant from "../components/application/csfa-needs-assessment/YukonGrant";
+
+
+
 import StudentModuleRoutes from "@/modules/student/router";
 import ApplicationTypeModuleRooutes from "@/modules/application-type/router";
 import InstitutionModuleRoutes from "@/modules/institution/router";
@@ -145,6 +151,37 @@ const routes = [
       requiresAuth: true
     }
   },
+
+
+
+  {
+    path: "/assessment/:id/canadian-armys-cholarship",
+    name: "CanadianArmyScholarship",
+    component: CanadianArmyScholarship,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: "/assessment/:id/student-training-allowance-other-fundings",
+    name: "CanadianArmyScholarship",
+    component: StudentTrainingAllowance_OtherFundings,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: "/assessment/:id/yukon-grant",
+    name: "YukonGrant",
+    component: YukonGrant,
+    meta: {
+      requiresAuth: true
+    }
+  },
+
+
+
+
   {
     path: "/student/:id",
     name: "StudentDetails",
