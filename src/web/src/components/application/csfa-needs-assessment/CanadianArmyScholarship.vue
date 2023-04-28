@@ -8,166 +8,198 @@
           <h3><strong>Disbursment - Miscellaneous</strong></h3>
           <div class="row">
             <div class="col-md-4">
-              <v-menu
-                :disabled="showAdd"
-                v-model="item.assessed_date_menu"
-                :close-on-content-click="false"
-                transition="scale-transition"
-                left
-                nudge-top="26"
-                offset-y
-                min-width="auto"
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-text-field
+              <div class="row justify-start">
+                <div class="col-md-9">
+                  <v-menu
                     :disabled="showAdd"
-                    v-model="item.assessed_date"
-                    label="Assessed Date"
-                    append-icon="mdi-calendar"
-                    hide-details
-                    readonly
-                    outlined
-                    dense
-                    background-color="white"
-                    v-bind="attrs"
-                    v-on="on"
-                  ></v-text-field>
-                </template>
-                <v-date-picker
-                  :disabled="showAdd"
-                  v-model="item.assessed_date"
-                  @input="item.assessed_date_menu = false"
-                ></v-date-picker>
-              </v-menu>
+                    v-model="item.assessed_date_menu"
+                    :close-on-content-click="false"
+                    transition="scale-transition"
+                    left
+                    nudge-top="26"
+                    offset-y
+                    min-width="auto"
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-text-field
+                        :disabled="showAdd"
+                        v-model="item.assessed_date"
+                        label="Assessed Date"
+                        append-icon="mdi-calendar"
+                        hide-details
+                        readonly
+                        outlined
+                        dense
+                        background-color="white"
+                        v-bind="attrs"
+                        v-on="on"
+                      ></v-text-field>
+                    </template>
+                    <v-date-picker
+                      :disabled="showAdd"
+                      v-model="item.assessed_date"
+                      @input="item.assessed_date_menu = false"
+                    ></v-date-picker>
+                  </v-menu>
+                </div>
+              </div>
             </div>
             <div class="col-md-4">
-              <v-menu
-                :disabled="showAdd"
-                v-model="item.issue_date_menu"
-                :close-on-content-click="false"
-                transition="scale-transition"
-                left
-                nudge-top="26"
-                offset-y
-                min-width="auto"
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-text-field
+              <div class="row justify-start">
+                <div class="col-md-9">
+                  <v-menu
                     :disabled="showAdd"
-                    v-model="item.issue_date"
-                    label="Issue Date"
-                    append-icon="mdi-calendar"
-                    hide-details
-                    readonly
-                    outlined
-                    dense
-                    background-color="white"
-                    v-bind="attrs"
-                    v-on="on"
-                  ></v-text-field>
-                </template>
-                <v-date-picker
-                  :disabled="showAdd"
-                  v-model="item.issue_date"
-                  @input="item.issue_date_menu = false"
-                ></v-date-picker>
-              </v-menu>
+                    v-model="item.issue_date_menu"
+                    :close-on-content-click="false"
+                    transition="scale-transition"
+                    left
+                    nudge-top="26"
+                    offset-y
+                    min-width="auto"
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-text-field
+                        :disabled="showAdd"
+                        v-model="item.issue_date"
+                        label="Issue Date"
+                        append-icon="mdi-calendar"
+                        hide-details
+                        readonly
+                        outlined
+                        dense
+                        background-color="white"
+                        v-bind="attrs"
+                        v-on="on"
+                      ></v-text-field>
+                    </template>
+                    <v-date-picker
+                      :disabled="showAdd"
+                      v-model="item.issue_date"
+                      @input="item.issue_date_menu = false"
+                    ></v-date-picker>
+                  </v-menu>
+                </div>
+              </div>
             </div>
             <div class="col-md-4">
-              <v-menu
-                :disabled="showAdd"
-                v-model="item.due_date_menu"
-                :close-on-content-click="false"
-                transition="scale-transition"
-                left
-                nudge-top="26"
-                offset-y
-                min-width="auto"
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-text-field
+              <div class="row justify-start">
+                <div class="col-md-9">
+                  <v-menu
                     :disabled="showAdd"
-                    v-model="item.due_date"
-                    label="Due Date"
-                    append-icon="mdi-calendar"
-                    hide-details
-                    readonly
-                    outlined
-                    dense
-                    background-color="white"
-                    v-bind="attrs"
-                    v-on="on"
-                  ></v-text-field>
-                </template>
-                <v-date-picker
-                  :disabled="showAdd"
-                  v-model="item.due_date"
-                  @input="item.due_date_menu = false"
-                ></v-date-picker>
-              </v-menu>
+                    v-model="item.due_date_menu"
+                    :close-on-content-click="false"
+                    transition="scale-transition"
+                    left
+                    nudge-top="26"
+                    offset-y
+                    min-width="auto"
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-text-field
+                        :disabled="showAdd"
+                        v-model="item.due_date"
+                        label="Due Date"
+                        append-icon="mdi-calendar"
+                        hide-details
+                        readonly
+                        outlined
+                        dense
+                        background-color="white"
+                        v-bind="attrs"
+                        v-on="on"
+                      ></v-text-field>
+                    </template>
+                    <v-date-picker
+                      :disabled="showAdd"
+                      v-model="item.due_date"
+                      @input="item.due_date_menu = false"
+                    ></v-date-picker>
+                  </v-menu>
+                </div>
+              </div>
             </div>
           </div>
           <div class="row">
             <div class="col-md-4">
-              <v-select
-                :disabled="showAdd"
-                outlined
-                dense
-                background-color="white"
-                hide-details
-                label="Disbursment Type"
-                @change="updateFundingRequest({ request_type_id: item.request_type_id }, item.id)"
-                v-model="item.request_type_id"
-                :items="fundingTypeOptions"
-                item-text="DESCRIPTION"
-                item-value="REQUEST_TYPE_ID"
-              ></v-select>
+              <div class="row justify-start">
+                <div class="col-md-9">
+                  <v-select
+                    :disabled="showAdd"
+                    outlined
+                    dense
+                    background-color="white"
+                    hide-details
+                    label="Disbursment Type"
+                    @change="updateFundingRequest({ request_type_id: item.request_type_id }, item.id)"
+                    v-model="item.request_type_id"
+                    :items="fundingTypeOptions"
+                    item-text="DESCRIPTION"
+                    item-value="REQUEST_TYPE_ID"
+                  ></v-select>
+                </div>
+              </div>
             </div>
             <div class="col-md-4">
-              <v-text-field
-                outlined
-                dense
-                background-color="white"
-                hide-details
-                label="Reference #"
-                v-model="ReferenceNumbver"
-              ></v-text-field>
+              <div class="row justify-start">
+                <div class="col-md-9">
+                  <v-text-field
+                    outlined
+                    dense
+                    background-color="white"
+                    hide-details
+                    label="Reference #"
+                    v-model="ReferenceNumbver"
+                  ></v-text-field>
+                </div>
+              </div>
             </div>
             <div class="col-md-4">
-              <v-text-field
-                outlined
-                dense
-                background-color="white"
-                hide-details
-                label="Tax Year"
-                @keypress="validate.isNumber($event)"
-                v-model="taxyear"
-              ></v-text-field>
+              <div class="row justify-start">
+                <div class="col-md-9">
+                  <v-text-field
+                    outlined
+                    dense
+                    background-color="white"
+                    hide-details
+                    label="Tax Year"
+                    @keypress="validate.isNumber($event)"
+                    v-model="taxyear"
+                  ></v-text-field>
+                </div>
+              </div>
             </div>
           </div>
           <div class="row">
             <div class="col-md-4">
-              <v-select
-                :disabled="showAdd"
-                outlined
-                dense
-                background-color="white"
-                hide-details
-                label="Change Reason"
-                v-model="change_reason"
-                item-text="DESCRIPTION"
-                item-value="REQUEST_TYPE_ID"
-              ></v-select>
+              <div class="row justify-start">
+                <div class="col-md-9">
+                  <v-select
+                    :disabled="showAdd"
+                    outlined
+                    dense
+                    background-color="white"
+                    hide-details
+                    label="Change Reason"
+                    v-model="change_reason"
+                    item-text="DESCRIPTION"
+                    item-value="REQUEST_TYPE_ID"
+                  ></v-select>
+                </div>
+              </div>
             </div>
             <div class="col-md-4">
-              <v-text-field
-                outlined
-                dense
-                background-color="white"
-                hide-details
-                label="Batch ID"
-                v-model="batch_id"
-              ></v-text-field>
+              <div class="row justify-start">
+                <div class="col-md-9">
+                  <v-text-field
+                    outlined
+                    dense
+                    background-color="white"
+                    hide-details
+                    label="Batch ID"
+                    v-model="batch_id"
+                  ></v-text-field>
+                </div>
+              </div>
             </div>
           </div>
         </v-card-text>
