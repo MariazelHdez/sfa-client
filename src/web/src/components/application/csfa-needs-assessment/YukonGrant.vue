@@ -2,11 +2,11 @@
   <div class="home">
     <h1>Funding Status</h1>
     <div class="col-md-12">
-      <v-card class="default mb-5" v-for="item, index in application.funding_requests" :key="index">
+      <v-card class="default mb-5 bg-color-blue" v-for="item, index in application.funding_requests" :key="index">
         <v-card-title>Assessment - Yukon Grant</v-card-title>
-        <v-card-text>
+        <v-card-text class="nopadding-lr">
           <div class="d-flex flex-row">
-            <div class="col-md-8">
+            <div class="col-md-8 nopadding">
               <div class="col-md-12 d-flex flex-row nopadding">
                 <div class="col-md-4">
                   <v-menu
@@ -247,7 +247,7 @@
                 </div>
               </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-4 nopadding">
               <div class="col-md-12 d-flex flex-row nopadding equalize-height">
                 <div class="col-md-12 ">
                   <v-btn 
@@ -370,7 +370,7 @@
               <div class="col-md-12 nopadding">
                 <div class="col-md-12 nopadding d-flex flex-row">
                   <div class="col-md-7 nopadding">
-                    <div class="col-md-12 ">
+                    <div class="col-md-12">
                       <v-text-field
                         outlined
                         dense
@@ -451,6 +451,10 @@ export default {
   .nopadding {
     padding: 0 !important;
   }
+  .nopadding-lr {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
   .equalize-heights {
     height: 40px∫;
   }
@@ -461,5 +465,8 @@ export default {
   .w-auto{
     min-width: unset !important;
     width: 100%;
+  }
+  .bg-color-blue{
+    background-color: #E2F1FD !important;
   }
 </style>

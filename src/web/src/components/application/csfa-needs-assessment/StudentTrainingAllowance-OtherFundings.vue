@@ -2,7 +2,7 @@
   <div class="home">
     <h1>Funding Status</h1>
     <div class="col-md-12">
-      <v-card class="default mb-5" v-for="item, index in application.funding_requests" :key="index">
+      <v-card class="default mb-5 bg-color-blue" v-for="item, index in application.funding_requests" :key="index">
         <v-card-title>Assessment - Student Training Allowance - Other Fundings</v-card-title>
         <v-card-text>
           <div class="row">
@@ -430,7 +430,7 @@
             </div>
           </div>
           <div class="col-md-12"></div>
-          <v-card class="default mb-5">
+          <v-card class="default mb-5 bg-color-blue">
             <v-card-title>Payment Management</v-card-title>
             <div class="row col-md-12">
               <div class="col-md-2">
@@ -584,3 +584,26 @@ export default {
   }
 };
 </script>
+<style>
+  .nopadding {
+    padding: 0 !important;
+  }
+  .nopadding-lr {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  .equalize-heights {
+    height: 40px∫;
+  }
+  .border-container{
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+  .w-auto{
+    min-width: unset !important;
+    width: 100%;
+  }
+  .bg-color-blue{
+    background-color: #E2F1FD !important;
+  }
+</style>
