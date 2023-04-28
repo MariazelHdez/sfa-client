@@ -6,8 +6,8 @@
         <v-card-title>Assessment - Yukon Grant</v-card-title>
         <v-card-text>
           <div class="d-flex flex-row">
-            <div class="col-md-9">
-              <div class="row d-flex flex-row">
+            <div class="col-md-8">
+              <div class="col-md-12 d-flex flex-row nopadding">
                 <div class="col-md-4">
                   <v-menu
                       :disabled="showAdd"
@@ -88,7 +88,7 @@
                   ></v-select>
                 </div>
               </div>
-              <div class="row d-flex flex-row">
+              <div class="col-md-12 d-flex flex-row nopadding">
                 <div class="col-md-4">
                   <v-menu
                     :disabled="showAdd"
@@ -166,7 +166,7 @@
                   ></v-text-field>
                 </div>
               </div>
-              <div class="row d-flex flex-row">
+              <div class="col-md-12 d-flex flex-row nopadding">
                 <div class="col-md-3">
                   <v-text-field
                     outlined
@@ -182,10 +182,10 @@
                   <p class="clearfix">1 = Quarters, 2 = Semesters</p>
                 </div>
               </div>
-              <div class="Row d-flex flex-row">
+              <div class="col-md-12 d-flex flex-row nopadding">
                 <v-card-title>Post Legislation Method</v-card-title>
               </div>
-              <div class="row d-flex flex-row">
+              <div class="col-md-12 d-flex flex-row nopadding">
                 <div class="col-md-3">
                   <v-text-field
                     outlined
@@ -220,7 +220,7 @@
                   ></v-text-field>
                 </div>
               </div>
-              <div class="col-md-9 d-flex flex-row justify-end">
+              <div class="col-md-9 d-flex flex-row justify-end nopadding">
                 <div class="col-md-4">
                   <v-text-field
                     outlined
@@ -233,7 +233,7 @@
                   ></v-text-field>
                 </div>
               </div>
-              <div class="col-md-12">
+              <div class="col-md-12 nopadding">
                 <div class="col-md-12">
                   <v-textarea
                     rows="3"
@@ -243,13 +243,182 @@
                     hide-details 
                     label="Comment"
                     v-model="comments"
-                >
-              </v-textarea>
+                  ></v-textarea>
                 </div>
               </div>
             </div>
-            <div class="col-md-3">
-              
+            <div class="col-md-4">
+              <div class="col-md-12 d-flex flex-row nopadding equalize-height">
+                <div class="col-md-12 ">
+                  <v-btn 
+                      :disabled="showAdd"
+                      dense
+                      color="blue" 
+                      class="my-0"
+                      block
+                    >
+                      Re-calc
+                  </v-btn>
+                </div>
+              </div>
+              <div class="col-md-12 nopadding">
+                <div class="col-md-12 nopadding d-flex flex-row">
+                  <div class="col-md-7 nopadding">
+                    <div class="col-md-12">
+                      <v-text-field
+                        outlined
+                        dense
+                        background-color="white"
+                        hide-details
+                        label="Travel Allowance"
+                        @keypress="validate.isNumber($event)"
+                        v-model="travel_allowance"
+                      ></v-text-field>
+                    </div>
+                    <div class="col-md-12 ">
+                      <v-text-field
+                        outlined
+                        dense
+                        background-color="white"
+                        hide-details
+                        label="Airfare Amount"
+                        @keypress="validate.isNumber($event)"
+                        v-model="airfare_amount"
+                      ></v-text-field>
+                    </div>
+                  </div>
+                  <div class="col-md-5 nopadding d-flex align-center">
+                    <div class="col-md-12 ">
+                      <v-text-field
+                        outlined
+                        dense
+                        background-color="white"
+                        hide-details
+                        label="Disbursement Period 1, 2..."
+                        @keypress="validate.isNumber($event)"
+                        v-model="disbursement_period"
+                      ></v-text-field>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-12 nopadding d-flex align-center">
+                  <div class="col-md-7">
+                    <v-text-field
+                      outlined
+                      dense
+                      background-color="white"
+                      hide-details
+                      label="No. of Disbursements"
+                      @keypress="validate.isNumber($event)"
+                      v-model="no_of_disbursements"
+                    ></v-text-field>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-12 nopadding">
+                <div class="col-md-12 nopadding d-flex flex-row">
+                  <div class="col-md-7 nopadding">
+                    <div class="col-md-12 ">
+                      <v-text-field
+                        outlined
+                        dense
+                        background-color="white"
+                        hide-details
+                        label="Adjust Amount"
+                        @keypress="validate.isNumber($event)"
+                        v-model="adjust_amount"
+                      ></v-text-field>
+                    </div>
+                    <div class="col-md-12 ">
+                      <v-text-field
+                        outlined
+                        dense
+                        background-color="white"
+                        hide-details
+                        label="Assessed Amount"
+                        @keypress="validate.isNumber($event)"
+                        v-model="assessed_amount"
+                      ></v-text-field>
+                    </div>
+                    <div class="col-md-12 ">
+                      <v-text-field
+                        outlined
+                        dense
+                        background-color="white"
+                        hide-details
+                        label="Previous Disbursement"
+                        @keypress="validate.isNumber($event)"
+                        v-model="previous_disbursement"
+                      ></v-text-field>
+                    </div>
+                  </div>
+                  <div class="col-md-5 nopadding d-flex align-end">
+                    <div class="col-md-12">
+                      <v-btn 
+                        :disabled="showAdd"
+                        dense
+                        color="blue" 
+                        class="my-0 w-auto"
+                        block
+                      >
+                        Disburse
+                      </v-btn>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-12 nopadding">
+                <div class="col-md-12 nopadding d-flex flex-row">
+                  <div class="col-md-7 nopadding">
+                    <div class="col-md-12 ">
+                      <v-text-field
+                        outlined
+                        dense
+                        background-color="white"
+                        hide-details
+                        label="Over Award"
+                        @keypress="validate.isNumber($event)"
+                        v-model="over_award"
+                      ></v-text-field>
+                    </div>
+                    <div class="col-md-12 ">
+                      <v-text-field
+                        outlined
+                        dense
+                        background-color="white"
+                        hide-details
+                        label="Over Disburse Period 1, 2..."
+                        @keypress="validate.isNumber($event)"
+                        v-model="over_disburse_period"
+                      ></v-text-field>
+                    </div>
+                    <div class="col-md-12 ">
+                      <v-text-field
+                        outlined
+                        dense
+                        background-color="white"
+                        hide-details
+                        label="Net Amount"
+                        @keypress="validate.isNumber($event)"
+                        v-model="net_amount"
+                      ></v-text-field>
+                    </div>
+                    <div class="col-md-12 ">
+                      <v-select
+                        :disabled="showAdd"
+                        outlined
+                        dense
+                        background-color="white"
+                        hide-details
+                        label="Assessment Type"
+                        v-model="assessment_type"
+                        item-text="DESCRIPTION"
+                        item-value="REQUEST_TYPE_ID"
+                      ></v-select>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </v-card-text>
@@ -278,3 +447,19 @@ export default {
   }
 };
 </script>
+<style>
+  .nopadding {
+    padding: 0 !important;
+  }
+  .equalize-heights {
+    height: 40px∫;
+  }
+  .border-container{
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+  .w-auto{
+    min-width: unset !important;
+    width: 100%;
+  }
+</style>
