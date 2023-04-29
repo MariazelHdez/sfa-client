@@ -3,9 +3,9 @@
     <h1>Funding Status</h1>
     <div class="col-md-12">
       <v-card class="default mb-5 bg-color-blue" v-for="item, index in application.funding_requests" :key="index">
-        <v-card-title>Assessment - Student Training Allowance - Other Fundings</v-card-title>
+        <v-card-title>Assessment - Yukon Excellence Awards</v-card-title>
         <v-card-text>
-          <div class="row">
+          <div class="row low-margin">
             <div class="col-md-4">
               <div class="row justify-start">
                 <div class="col-md-9">
@@ -52,8 +52,8 @@
                     dense
                     background-color="white"
                     hide-details
-                    label="Home Community"
-                    v-model="change_reason"
+                    label="Assessment Type"
+                    v-model="assessment_type"
                     item-text="DESCRIPTION"
                     item-value="REQUEST_TYPE_ID"
                   ></v-select>
@@ -63,19 +63,6 @@
             <div class="col-md-4">
               <div class="row justify-start">
                 <div class="col-md-8">
-                  <v-select
-                    :disabled="showAdd"
-                    outlined
-                    dense
-                    background-color="white"
-                    hide-details
-                    label="Travel Allowance"
-                    v-model="change_reason"
-                    item-text="DESCRIPTION"
-                    item-value="REQUEST_TYPE_ID"
-                  ></v-select>
-                </div>
-                <div class="col-md-3">
                   <v-btn 
                     :disabled="showAdd"
                     dense
@@ -85,75 +72,6 @@
                   >
                     Re-calc
                   </v-btn>
-                </div>
-              </div>
-            </div>
-          
-          </div>
-          <div class="row">
-            <div class="col-md-4">
-              <div class="row justify-start">
-                <div class="col-md-9">
-                  <v-menu
-                    :disabled="showAdd"
-                    v-model="effective_rate_date_menu"
-                    :close-on-content-click="false"
-                    transition="scale-transition"
-                    left
-                    nudge-top="26"
-                    offset-y
-                    min-width="auto"
-                  >
-                    <template v-slot:activator="{ on, attrs }">
-                      <v-text-field
-                        :disabled="showAdd"
-                        v-model="effective_rate_date"
-                        label="Effective Rate Date"
-                        append-icon="mdi-calendar"
-                        hide-details
-                        readonly
-                        outlined
-                        dense
-                        background-color="white"
-                        v-bind="attrs"
-                        v-on="on"
-                      ></v-text-field>
-                    </template>
-                    <v-date-picker
-                      :disabled="showAdd"
-                      v-model="effective_rate_date"
-                      @input="effective_rate_date_menu = false"
-                    ></v-date-picker>
-                  </v-menu>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="row justify-start">
-                <div class="col-md-9">
-                  <v-text-field
-                    outlined
-                    dense
-                    background-color="white"
-                    hide-details
-                    label="Institution Community"
-                    v-model="batch_id"
-                  ></v-text-field>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="row justify-start">
-                <div class="col-md-8">
-                  <v-text-field
-                    outlined
-                    dense
-                    background-color="white"
-                    hide-details
-                    label="Assessed Amount"
-                    @keypress="validate.isNumber($event)"
-                    v-model="application.assessed_amount"
-                  ></v-text-field>
                 </div>
               </div>
             </div>
@@ -199,38 +117,6 @@
             <div class="col-md-4">
               <div class="row justify-start">
                 <div class="col-md-9">
-                  <v-text-field
-                    outlined
-                    dense
-                    background-color="white"
-                    hide-details
-                    label="Dependent Count"
-                    @keypress="validate.isNumber($event)"
-                    v-model="dependent_count"
-                  ></v-text-field>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="row justify-start">
-                <div class="col-md-8">
-                  <v-text-field
-                    outlined
-                    dense
-                    background-color="white"
-                    hide-details
-                    label="Previous Disbursements"
-                    @keypress="validate.isNumber($event)"
-                    v-model="previous_disbursements"
-                  ></v-text-field>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-4">
-              <div class="row justify-start">
-                <div class="col-md-9">
                   <v-menu
                     :disabled="showAdd"
                     v-model="classes_end_date_menu"
@@ -267,15 +153,47 @@
             </div>
             <div class="col-md-4">
               <div class="row justify-start">
+                <div class="col-md-8">
+                  <v-text-field
+                    outlined
+                    dense
+                    background-color="white"
+                    hide-details
+                    label="Assessed Amount"
+                    @keypress="validate.isNumber($event)"
+                    v-model="application.assessed_amount"
+                  ></v-text-field>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row low-margin">
+            <div class="col-md-4">
+              <div class="row justify-start">
                 <div class="col-md-9">
                   <v-text-field
                     outlined
                     dense
                     background-color="white"
                     hide-details
-                    label="2nd Residence Rate"
+                    label="YEA Earned"
                     @keypress="validate.isNumber($event)"
-                    v-model="second_residence_rte_amount"
+                    v-model="yea_earned"
+                  ></v-text-field>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="row justify-start">
+                <div class="col-md-9">
+                  <v-text-field
+                    outlined
+                    dense
+                    background-color="white"
+                    hide-details
+                    label="YEA Used"
+                    @keypress="validate.isNumber($event)"
+                    v-model="yea_used"
                   ></v-text-field>
                 </div>
               </div>
@@ -288,145 +206,142 @@
                     dense
                     background-color="white"
                     hide-details
-                    label="Net Amount"
+                    label="Previous Disbursements"
                     @keypress="validate.isNumber($event)"
-                    v-model="net_amount"
+                    v-model="previous_disbursements"
                   ></v-text-field>
-                </div>
-                <div class="col-md-3">
-                  <v-btn 
-                    :disabled="showAdd"
-                    dense
-                    color="blue" 
-                    class="my-0"
-                    block
-                  >
-                    Disburse
-                  </v-btn>
                 </div>
               </div>
             </div>
           </div>
-          <div class="row low-margin">
-            <div class="col-md-12">
-              <div class="row justify-end">
-                <div class="col-md-4">
-                  <div class="row justify-start">
-                    <div class="col-md-8">
-                      <v-select
-                        :disabled="showAdd"
+          <div class="row">
+            <div class="col-md-4">
+              <div class="row justify-start">
+                <div class="col-md-9">
+                  <v-text-field
+                    outlined
+                    dense
+                    background-color="white"
+                    hide-details
+                    label="YEA Earned"
+                    @keypress="validate.isNumber($event)"
+                    v-model="yea_earned"
+                  ></v-text-field>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="row justify-start">
+                <div class="col-md-9">
+                  <v-text-field
+                    outlined
+                    dense
+                    background-color="white"
+                    hide-details
+                    label="YEA Used"
+                    @keypress="validate.isNumber($event)"
+                    v-model="yea_used"
+                  ></v-text-field>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="row justify-start">
+                <div class="col-md-8">
+                  <v-text-field
+                    outlined
+                    dense
+                    background-color="white"
+                    hide-details
+                    label="Previous Disbursements"
+                    @keypress="validate.isNumber($event)"
+                    v-model="previous_disbursements"
+                  ></v-text-field>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12 nopadding d-flex">
+              <div class="col-md-8">
+                <div class="row justify-start">
+                  <div class="col-md-11">
+                    <v-textarea
+                      rows="3"
+                      style="width:95.25%;"
+                      outlined 
+                      dense 
+                      background-color="white" 
+                      hide-details 
+                      label="Comment"
+                      v-model="comments"
+                      >
+                    </v-textarea>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="row justify-start d-flex">
+                  <div class="col-md-8">
+                    <v-text-field
                         outlined
                         dense
                         background-color="white"
                         hide-details
-                        label="Assessment Type"
-                        v-model="assessment_type"
-                        item-text="DESCRIPTION"
-                        item-value="REQUEST_TYPE_ID"
-                      ></v-select>
-                    </div>
+                        label="Assessed Amount"
+                        @keypress="validate.isNumber($event)"
+                        v-model="assessed_amount"
+                      ></v-text-field>
+                  </div>
+                  <div class="col-md-8">
+                    <v-text-field
+                        outlined
+                        dense
+                        background-color="white"
+                        hide-details
+                        label="Previous Disbursements"
+                        @keypress="validate.isNumber($event)"
+                        v-model="previous_disbursements"
+                      ></v-text-field>
+                  </div>
+                  <div class="col-md-3">
+                    <v-btn 
+                      :disabled="showAdd"
+                      dense
+                      color="blue" 
+                      class="my-0"
+                      block
+                    >
+                    Disburse
+                  </v-btn>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          <div class="row">
-            <div class="col-md-2">
-              <v-text-field
-                outlined
-                dense
-                background-color="white"
-                hide-details
-                label="Fraction of whole year"
-                @keypress="validate.isNumber($event)"
-                v-model="fraction_of_whole_year"
-              ></v-text-field>
-            </div>
-            <div class="col-md-2">
-              <v-text-field
-                outlined
-                dense
-                background-color="white"
-                hide-details
-                label="Years Funded"
-                @keypress="validate.isNumber($event)"
-                v-model="years_funded"
-              ></v-text-field>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-2">
-              <v-text-field
-                outlined
-                dense
-                background-color="white"
-                hide-details
-                label="Previous Weeks"
-                @keypress="validate.isNumber($event)"
-                v-model="previous_weeks"
-              ></v-text-field>
-            </div>
-            <div class="col-md-2">
-              <v-text-field
-                outlined
-                dense
-                background-color="white"
-                hide-details
-                label="Assessed Weeks"
-                @keypress="validate.isNumber($event)"
-                v-model="assessed_weeks"
-              ></v-text-field>
-            </div>
-            <div class="col-md-2">
-              <v-text-field
-                outlined
-                dense
-                background-color="white"
-                hide-details
-                label="Allowed Weeks"
-                @keypress="validate.isNumber($event)"
-                v-model="allowed_weeks"
-              ></v-text-field>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-2">
-              <v-text-field
-                outlined
-                dense
-                background-color="white"
-                hide-details
-                label="Previous Weeks"
-                @keypress="validate.isNumber($event)"
-                v-model="previous_weeks"
-              ></v-text-field>
-            </div>
-            <div class="col-md-2 hidden-xs hidden-mobile">
-            </div>
-            <div class="col-md-2">
-              <v-text-field
-                outlined
-                dense
-                background-color="white"
-                hide-details
-                label="Assessed Weeks"
-                @keypress="validate.isNumber($event)"
-                v-model="assessed_weeks"
-              ></v-text-field>
-            </div>
-          </div>
           <div class="row low-margin">
-            <div class="col-md-9">
-              <v-textarea
-                    rows="3"
-                    outlined 
-                    dense 
-                    background-color="white" 
-                    hide-details 
-                    label="Comment"
-                    v-model="comments"
-                >
-              </v-textarea>
+            <div class="col-md-12 nopadding d-flex">
+              <div class="col-md-8">
+                <div class="row justify-start">
+                  <div class="col-md-10">
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="row justify-start d-flex">
+                  <div class="col-md-8">
+                    <v-text-field
+                        outlined
+                        dense
+                        background-color="white"
+                        hide-details
+                        label="Previous Disbursements"
+                        @keypress="validate.isNumber($event)"
+                        v-model="previous_disbursements"
+                      ></v-text-field>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <v-card class="default mb-5 bg-color-blue">
@@ -590,9 +505,6 @@ export default {
   .nopadding-lr {
     padding-left: 0 !important;
     padding-right: 0 !important;
-  }
-  .nomargin-bottom {
-    margin-bottom: 0 !important;
   }
   .equalize-heights {
     height: 40px;

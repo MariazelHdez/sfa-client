@@ -26,7 +26,7 @@ import Documentation from "../components/application/Documentation";
 import CanadianArmyScholarship from "../components/application/csfa-needs-assessment/CanadianArmyScholarship";
 import StudentTrainingAllowance_OtherFundings from "../components/application/csfa-needs-assessment/StudentTrainingAllowance-OtherFundings";
 import YukonGrant from "../components/application/csfa-needs-assessment/YukonGrant";
-
+import YukonExcellenceAwards from "../components/application/csfa-needs-assessment/YukonExcellenceAwards";
 
 
 import StudentModuleRoutes from "@/modules/student/router";
@@ -178,6 +178,17 @@ const routes = [
       requiresAuth: true
     }
   },
+  {
+    path: "/assessment/:id/yukon-excellence-awards",
+    name: "YukonExcellenceAwards",
+    component: YukonExcellenceAwards,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  
+
+
 
 
 
