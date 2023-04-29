@@ -28,7 +28,6 @@ import StudentTrainingAllowance_OtherFundings from "../components/application/cs
 import YukonGrant from "../components/application/csfa-needs-assessment/YukonGrant";
 import YukonExcellenceAwards from "../components/application/csfa-needs-assessment/YukonExcellenceAwards";
 
-
 import StudentModuleRoutes from "@/modules/student/router";
 import ApplicationTypeModuleRooutes from "@/modules/application-type/router";
 import InstitutionModuleRoutes from "@/modules/institution/router";
@@ -151,9 +150,6 @@ const routes = [
       requiresAuth: true
     }
   },
-
-
-
   {
     path: "/assessment/:id/canadian-armys-cholarship",
     name: "CanadianArmyScholarship",

@@ -159,9 +159,9 @@
                     dense
                     background-color="white"
                     hide-details
-                    label="Assessed Amount"
+                    label="YEA Expiry Date""
                     @keypress="validate.isNumber($event)"
-                    v-model="application.assessed_amount"
+                    v-model="yea_expiry_date"
                   ></v-text-field>
                 </div>
               </div>
@@ -206,9 +206,9 @@
                     dense
                     background-color="white"
                     hide-details
-                    label="Previous Disbursements"
+                    label="YEA Balance"
                     @keypress="validate.isNumber($event)"
-                    v-model="previous_disbursements"
+                    v-model="yea_balance"
                   ></v-text-field>
                 </div>
               </div>
@@ -223,9 +223,9 @@
                     dense
                     background-color="white"
                     hide-details
-                    label="YEA Earned"
+                    label="Type of Payment"
                     @keypress="validate.isNumber($event)"
-                    v-model="yea_earned"
+                    v-model="type_of_payment"
                   ></v-text-field>
                 </div>
               </div>
@@ -238,7 +238,7 @@
                     dense
                     background-color="white"
                     hide-details
-                    label="YEA Used"
+                    label="Receipts Received"
                     @keypress="validate.isNumber($event)"
                     v-model="yea_used"
                   ></v-text-field>
@@ -253,9 +253,9 @@
                     dense
                     background-color="white"
                     hide-details
-                    label="Previous Disbursements"
+                    label="Total Requested"
                     @keypress="validate.isNumber($event)"
-                    v-model="previous_disbursements"
+                    v-model="total_requested"
                   ></v-text-field>
                 </div>
               </div>
@@ -335,9 +335,9 @@
                         dense
                         background-color="white"
                         hide-details
-                        label="Previous Disbursements"
+                        label="Net Amount"
                         @keypress="validate.isNumber($event)"
-                        v-model="previous_disbursements"
+                        v-model="net_amount"
                       ></v-text-field>
                   </div>
                 </div>
