@@ -1,10 +1,10 @@
 <template>
-  <div class="home yukon-grant-assessment">
+  <div class="home training-allowance-assessment">
     <h1>Funding Status</h1>
     <div class="col-md-12">
       <v-card class="default mb-5 bg-color-blue" v-for="item, index in application.funding_requests" :key="index">
         <div class="col-lg-12 nopadding d-flex flex-wrap low-margin">
-          <v-card-title class="col-xs-12 col-lg-8">Assessment - Yukon Grant</v-card-title>
+          <v-card-title class="col-xs-12 col-lg-8">Assessment - Training Allowance</v-card-title>
           <div class="col-xs-12 col-lg-4 nopadding d-flex">
             <div class="col-xs-4 col-sm-4">
               <v-btn 
@@ -111,20 +111,7 @@
                     ></v-date-picker>
                   </v-menu>
                 </div>
-                <div class="col-xs-12 col-lg-12 mobile-noppading-bottom">
-                  <v-text-field
-                    outlined
-                    dense
-                    background-color="white"
-                    hide-details
-                    label="Program Division"
-                    @keypress="validate.isNumber($event)"
-                    v-model="program_division"
-                  ></v-text-field>
-                </div>
-              </div>
-              <div class="col-xs-12 col-lg-4 nopadding d-flex flex-wrap">
-                <div class="col-xs-12 col-lg-12 clss-st-date-re-order">
+                <div class="col-xs-12 col-lg-12">
                   <v-menu
                       :disabled="showAdd"
                       v-model="classes_start_date_menu"
@@ -157,44 +144,41 @@
                       ></v-date-picker>
                   </v-menu>
                 </div>
-                <div class="col-xs-12 col-lg-12 clss-en-date-re-order mobile-low-margin">
+                <div class="col-xs-12 col-lg-12">
                   <v-menu
-                    :disabled="showAdd"
-                    v-model="classes_end_date_menu"
-                    :close-on-content-click="false"
-                    transition="scale-transition"
-                    left
-                    nudge-top="26"
-                    offset-y
-                    min-width="auto"
-                  >
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-text-field
                       :disabled="showAdd"
-                      v-model="classes_end_date"
-                      label="Classes End Date"
-                      append-icon="mdi-calendar"
-                      hide-details
-                      readonly
-                      outlined
-                      dense
-                      background-color="white"
-                      v-bind="attrs"
-                      v-on="on"
-                    ></v-text-field>
-                    </template>
-                    <v-date-picker
-                      :disabled="showAdd"
-                      v-model="classes_end_date"
-                      @input="classes_end_date_menu = false"
-                    ></v-date-picker>
+                      v-model="classes_end_date_menu"
+                      :close-on-content-click="false"
+                      transition="scale-transition"
+                      left
+                      nudge-top="26"
+                      offset-y
+                      min-width="auto"
+                    >
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-text-field
+                          :disabled="showAdd"
+                          v-model="classes_start_date"
+                          label="Classes End Date"
+                          append-icon="mdi-calendar"
+                          hide-details
+                          readonly
+                          outlined
+                          dense
+                          background-color="white"
+                          v-bind="attrs"
+                          v-on="on"
+                        ></v-text-field>
+                      </template>
+                      <v-date-picker
+                        :disabled="showAdd"
+                        v-model="classes_end_date"
+                        @input="classes_end_date_menu = false"
+                      ></v-date-picker>
                   </v-menu>
                 </div>
-                <div class="col-xs-12 col-lg-12 line-jump-height d-flex align-center help-txt-re-order mobile-noppading-top">
-                  <p class="nomargin-bottom">1 = Quarters, 2 = Semesters</p>
-                </div>
               </div>
-              <div class="col-xs-12 col-lg-4 nopadding d-flex flex-wrap">
+              <div class="col-xs-12 col-lg-8 nopadding">
                 <div class="col-xs-12 col-lg-12">
                   <v-select
                     :disabled="showAdd"
@@ -214,11 +198,32 @@
                     dense
                     background-color="white"
                     hide-details
-                    label="Destination City"
-                    v-model="batch_id"
+                    label="Institution Community"
+                    v-model="institution_community"
                   ></v-text-field>
                 </div>
-                <div class="col-xs-12 col-lg-12 line-jump-height d-flex align-center not-displayed-sx"></div>
+                <div class="col-xs-12 col-lg-6">
+                  <v-text-field
+                    outlined
+                    dense
+                    background-color="white"
+                    hide-details
+                    label="Dependent Count"
+                    @keypress="validate.isNumber($event)"
+                    v-model="dependent_count"
+                  ></v-text-field>
+                </div>
+                <div class="col-xs-12 col-lg-6">
+                  <v-text-field
+                    outlined
+                    dense
+                    background-color="white"
+                    hide-details
+                    label="2nd Residence Rate"
+                    @keypress="validate.isNumber($event)"
+                    v-model="second_residence_rate"
+                  ></v-text-field>
+                </div>
               </div>
             </div>
             <div class="col-xs-12 col-lg-12 nopadding d-flex mobile-column-flex low-margin flex-wrap">
@@ -232,31 +237,9 @@
                     dense
                     background-color="white"
                     hide-details
-                    label="Allowed Months"
+                    label="Fraction of whole year"
                     @keypress="validate.isNumber($event)"
-                    v-model="allowed_months"
-                  ></v-text-field>
-                </div>
-                <div class="col-xs-12 col-lg-12">
-                  <v-text-field
-                    outlined
-                    dense
-                    background-color="white"
-                    hide-details
-                    label="Faction of whole year"
-                    @keypress="validate.isNumber($event)"
-                    v-model="faction_of_whole_year"
-                  ></v-text-field>
-                </div>
-                <div class="col-xs-12 col-lg-12">
-                  <v-text-field
-                    outlined
-                    dense
-                    background-color="white"
-                    hide-details
-                    label="Years Funded"
-                    @keypress="validate.isNumber($event)"
-                    v-model="years_funded"
+                    v-model="fraction_of_whole_year"
                   ></v-text-field>
                 </div>
               </div>
@@ -267,48 +250,11 @@
                     dense
                     background-color="white"
                     hide-details
-                    label="Living Costs"
+                    label="Year Funded"
                     @keypress="validate.isNumber($event)"
-                    v-model="living_costs"
+                    v-model="year_funded"
                   ></v-text-field>
                 </div>
-                <div class="col-xs-12 col-lg-12">
-                  <v-text-field
-                    outlined
-                    dense
-                    background-color="white"
-                    hide-details
-                    label="Allowed Tuition"
-                    @keypress="validate.isNumber($event)"
-                    v-model="allowed_tuition"
-                  ></v-text-field>
-                </div>
-                <div class="col-xs-12 col-lg-12">
-                  <v-text-field
-                    outlined
-                    dense
-                    background-color="white"
-                    hide-details
-                    label="Allowed Books"
-                    @keypress="validate.isNumber($event)"
-                    v-model="allowed_books"
-                  ></v-text-field>
-                </div>
-              </div>
-              <div class="col-xs-12 col-sm-4 col-lg-4 nopadding d-flex flex-wrap">
-                <div class="col-xs-12 col-lg-12">
-                  <v-text-field
-                    outlined
-                    dense
-                    background-color="white"
-                    hide-details
-                    label="Amount"
-                    @keypress="validate.isNumber($event)"
-                    v-model="amount"
-                  ></v-text-field>
-                </div>
-                <div class="col-xs-12 col-lg-12 line-jump-height d-flex align-center not-displayed-sx"></div>
-                <div class="col-xs-12 col-lg-12 line-jump-height d-flex align-center not-displayed-sx"></div>
               </div>
             </div>
             <div class="col-xs-12 col-lg-12 nopadding d-flex mobile-column-flex low-margin flex-wrap">
@@ -327,7 +273,17 @@
                     v-model="previous_weeks"
                   ></v-text-field>
                 </div>
-                <div class="col-xs-12 col-lg-12 line-jump-height d-flex align-center not-displayed-sx not-displayed-sx-md"></div>
+                <div class="col-xs-12 col-lg-12">
+                  <v-text-field
+                    outlined
+                    dense
+                    background-color="white"
+                    hide-details
+                    label="Previous Upgrade Weeks"
+                    @keypress="validate.isNumber($event)"
+                    v-model="previous_upgrade_weeks"
+                  ></v-text-field>
+                </div>
               </div>
               <div class="col-xs-12 col-sm-4 col-lg-4 nopadding d-flex flex-wrap mobile-low-margin">
                 <div class="col-xs-12 col-lg-12">
@@ -371,8 +327,20 @@
           </div>
           <div class="col-xs-12 col-lg-4 nopadding right-block-container">
             <div class="not-displayed-lg"></div>
-            <div class="col-lg-12 nopadding d-flex line-jump-height">
-              <div class="col-sm-4 col-lg-7 not-displayed-sx"></div>
+            <div class="col-lg-12 nopadding d-flex align-center flex-wrap">
+              <div class="col-sm-6 col-lg-7 nopadding d-flex flex-wrap">
+                <div class="col-xs-12 col-lg-12">
+                  <v-text-field
+                      outlined
+                      dense
+                      background-color="white"
+                      hide-details
+                      label="Travel Allowance"
+                      @keypress="validate.isNumber($event)"
+                      v-model="travel_allowance"
+                  ></v-text-field>
+                </div>
+              </div>
               <div class="col-xs-12 col-sm-4 col-lg-5">
                 <v-btn 
                   :disabled="showAdd"
@@ -385,68 +353,8 @@
                 </v-btn>
               </div>
             </div>
-            <div class="col-lg-12 nopadding d-flex align-center flex-wrap">
-              <div class="col-sm-6 col-lg-7 nopadding d-flex flex-wrap mobile-custom-border">
-                <div class="col-xs-12 col-lg-12">
-                  <v-text-field
-                    outlined
-                    dense
-                    background-color="white"
-                    hide-details
-                    label="Travel Allowance"
-                    @keypress="validate.isNumber($event)"
-                    v-model="travel_allowance"
-                  ></v-text-field>
-                </div>
-                <div class="col-xs-12 col-lg-12">
-                  <v-text-field
-                    outlined
-                    dense
-                    background-color="white"
-                    hide-details
-                    label="Airfare Amount"
-                    @keypress="validate.isNumber($event)"
-                    v-model="airfare_amount"
-                  ></v-text-field>
-                </div>
-              </div>
-              <div class="col-sm-6 col-lg-5 d-flex align-center nopadding-left mobile-custom-border-2">
-                <img class="not-displayed-sx" src="../../../../public/img/curly-brackets.png">
-                <v-text-field
-                  outlined
-                  dense
-                  background-color="white"
-                  hide-details
-                  label="Disbursement Period 1, 2..."
-                  @keypress="validate.isNumber($event)"
-                  v-model="disbursement_period"
-                ></v-text-field>
-              </div>
-              <div class="col-sm-6 col-lg-7 low-margin">
-                <v-text-field
-                  outlined
-                  dense
-                  background-color="white"
-                  hide-details
-                  label="No. of disbursements"
-                  @keypress="validate.isNumber($event)"
-                  v-model="no_of_disbursements"
-                ></v-text-field>
-              </div>
-            </div>
             <div class="col-lg-12 nopadding d-flex align-end flex-wrap">
               <div class="col-sm-6 col-lg-7 nopadding d-flex flex-wrap">
-                <div class="col-xs-12 col-lg-12">
-                  <v-text-field
-                    outlined
-                    dense
-                    background-color="white"
-                    hide-details
-                    label="Adjust Amount"
-                    @keypress="validate.isNumber($event)"
-                    v-model="adjust_amount"
-                  ></v-text-field>
-                </div>
                 <div class="col-xs-12 col-lg-12">
                   <v-text-field
                     outlined
@@ -458,13 +366,24 @@
                     v-model="assessed_amount"
                   ></v-text-field>
                 </div>
-                <div class="col-xs-12 col-lg-12 low-margin mobile-noppading-bottom">
+                <div class="col-xs-12 col-lg-12">
                   <v-text-field
                     outlined
                     dense
                     background-color="white"
                     hide-details
                     label="Previous Disbursement"
+                    @keypress="validate.isNumber($event)"
+                    v-model="previous_disbursement"
+                  ></v-text-field>
+                </div>
+                <div class="col-xs-12 col-lg-12 low-margin mobile-noppading-bottom">
+                  <v-text-field
+                    outlined
+                    dense
+                    background-color="white"
+                    hide-details
+                    label="Net Amount"
                     @keypress="validate.isNumber($event)"
                     v-model="previous_disbursement"
                   ></v-text-field>
@@ -481,49 +400,6 @@
                   >
                   DISBURSE
                   </v-btn>
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-12 nopadding d-flex align-center flex-wrap low-margin">
-              <div class="col-sm-6 col-lg-7 nopadding d-flex flex-wrap">
-                <div class="col-xs-12 col-lg-12">
-                  <v-text-field
-                    outlined
-                    dense
-                    background-color="white"
-                    hide-details
-                    label="Over Award"
-                    @keypress="validate.isNumber($event)"
-                    v-model="over_award"
-                  ></v-text-field>
-                </div>
-                <div class="col-xs-12 col-lg-12">
-                  <v-text-field
-                    outlined
-                    dense
-                    background-color="white"
-                    hide-details
-                    label="Over Disburse Period"
-                    @keypress="validate.isNumber($event)"
-                    v-model="over_disburse_period"
-                  ></v-text-field>
-                </div>
-                <div class="col-xs-12 col-lg-12">
-                  <v-text-field
-                    outlined
-                    dense
-                    background-color="white"
-                    hide-details
-                    label="Net Amount"
-                    @keypress="validate.isNumber($event)"
-                    v-model="net_amount"
-                  ></v-text-field>
-                </div>
-              </div>
-              <div class="col-sm-4 col-lg-5 d-flex nopadding line-jump-height align-center justify-center">
-                <div class="col-xs-12 col-lg-12 height-fit-content d-flex justify-center">
-                  <v-switch label="Applied">
-                  </v-switch>
                 </div>
               </div>
             </div>
@@ -547,13 +423,7 @@
           <div class="col-xs-1 col-sm-1 col-lg-1 nopadding d-flex align-center justify-center">
             <p class="nomargin">Issue Date</p>
           </div>
-          <div class="col-xs-1 col-sm-1 col-lg-1 nopadding d-flex align-center justify-center">
-            <p class="nomargin">Tax Year</p>
-          </div>
-          <div class="col-xs-1 col-sm-1 col-lg-1 nopadding d-flex align-center justify-center">
-            <p class="nomargin">Due Date</p>
-          </div>
-          <div class="col-xs-3 col-sm-3 col-lg-3 nopadding d-flex align-center justify-center">
+          <div class="col-xs-5 col-sm-5 col-lg-5 nopadding d-flex align-center justify-center">
             <p class="nomargin">Change Reason</p>
           </div>
           <div class="col-xs-1 col-sm-1 col-lg-1 nopadding d-flex align-center justify-center">
@@ -603,27 +473,7 @@
               v-model="issue_date"
             ></v-text-field>
           </div>
-          <div class="col-xs-1 col-sm-1 col-lg-1 nopadding">
-            <v-text-field
-              outlined
-              dense
-              background-color="white"
-              hide-details
-              @keypress="validate.isNumber($event)"
-              v-model="tax_year"
-            ></v-text-field>
-          </div>
-          <div class="col-xs-1 col-sm-1 col-lg-1 nopadding">
-            <v-text-field
-              outlined
-              dense
-              background-color="white"
-              hide-details
-              @keypress="validate.isNumber($event)"
-              v-model="due_date"
-            ></v-text-field>
-          </div>
-          <div class="col-xs-3 col-sm-3 col-lg-3 nopadding">
+          <div class="col-xs-5 col-sm-5 col-lg-5 nopadding">
             <v-select
               :disabled="showAdd"
               outlined
@@ -735,8 +585,12 @@ export default {
   .v-btn:not(.v-btn--round).v-size--default{
     padding: 0 8px !important;
   }
-  .right-block-container > div{
+  .training-allowance-assessment .right-block-container > div{
+    border-left: 0px;
+  }
+  .training-allowance-assessment .right-block-container{
     border-left: 1px solid #ccc;
+    margin-bottom: 20px;
   }
   .not-displayed-lg{
     display: none;
@@ -757,11 +611,14 @@ export default {
   .justify-center{
     justify-content: center !important;
   }
-  .yukon-grant-assessment .right-block-container img{
+  .training-allowance-assessment .right-block-container img{
     max-height: 80px !important;
     padding-right: 10px;
   }
   @media (max-width: 1263px) {
+    .training-allowance-assessment .right-block-container{
+      border-left: 0px;
+    }
     .v-card__title{
       font-size: 1.25rem !important;
     }
@@ -770,7 +627,7 @@ export default {
       height: 0px;
       margin: 20px 15px;
     }
-    .yukon-grant-assessment .right-block-container .not-displayed-lg{
+    .training-allowance-assessment .right-block-container .not-displayed-lg{
       border-top: 1px solid #ccc;
     }
     .not-displayed-sx-md,
@@ -807,12 +664,6 @@ export default {
       border-right: 20px solid transparent;
       border-top: 15px solid #ccc;
       clear: both;
-    }
-    .gray-arrow-down{
-      width: 0; 
-      height: 0; 
-      border-left: 20px solid #ccc;
-      border-right: 20px solid #ccc;
     }
     .nopadding-left{
       padding-left: 14px !important;
