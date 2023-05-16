@@ -13,7 +13,7 @@
               background-color="white"
               hide-details
               label="Restrict / Warning Code"
-              v-model="restrict_code"
+              v-model="application.warning_code.warning_code"
             ></v-text-field>
             <v-text-field
               outlined
@@ -22,7 +22,7 @@
               background-color="white"
               hide-details
               label="Type"
-              v-model="restrict_type"
+              v-model="application.warning_code.code_type"
             ></v-text-field>
           </div>
           <div class="col-md-8">
@@ -33,7 +33,7 @@
               background-color="white"
               hide-details
               label="Definition"
-              v-model="restrict_definition"
+              v-model="application.warning_code.definition"
             ></v-textarea>
           </div>
 
@@ -46,7 +46,7 @@
               background-color="white"
               hide-details
               label="Reason Code"
-              v-model="reason_code"
+              v-model="application.reason_code.reason_code"
             ></v-text-field>
             <v-text-field
               outlined
@@ -55,7 +55,7 @@
               background-color="white"
               hide-details
               label="Type"
-              v-model="reason_type"
+              v-model="application.reason_code.reason_type"
             ></v-text-field>
           </div>
           <div class="col-md-8">
@@ -66,7 +66,7 @@
               background-color="white"
               hide-details
               label="Definition"
-              v-model="reason_definition"
+              v-model="application.reason_code.definition"
             ></v-textarea>
           </div>
 
@@ -82,22 +82,32 @@
             >
               <template v-slot:activator="{ on, attrs }">
                 <v-text-field
-                  v-model="clearance_received_date"
+                  :value="application.csl_clearance_date?.slice(0, 10)"
                   label="Clearance received date"
                   append-icon="mdi-calendar"
                   hide-details
                   readonly
                   outlined
                   dense
-              disabled
                   background-color="white"
                   v-bind="attrs"
                   v-on="on"
                 ></v-text-field>
               </template>
               <v-date-picker
-                v-model="clearance_received_date"
-                @input="clearance_received_menu = false"
+                :value="application.csl_clearance_date?.slice(0, 10)"
+                @input="
+                  (e) => {
+                    application.csl_clearance_date = e;
+                    check_completion_menu = false;
+                  }
+                "
+                @change="
+                  doSaveApp(
+                    'csl_clearance_date',
+                    application.csl_clearance_date
+                  )
+                "
               ></v-date-picker>
             </v-menu>
           </div>
@@ -105,11 +115,21 @@
             <v-textarea
               outlined
               dense
-              disabled
               background-color="white"
               hide-details
               label="Comment"
-              v-model="clearance_comment"
+              v-model="application.csl_restriction_comment"
+              @input="
+                (e) => {
+                  application.csl_restriction_comment = e;
+                }
+              "
+              @change="
+                doSaveApp(
+                  'csl_restriction_comment',
+                  application.csl_restriction_comment
+                )
+              "
             ></v-textarea>
           </div>
 
@@ -137,12 +157,23 @@
             <v-select
               outlined
               dense
-              disabled
               background-color="white"
               hide-details
-              label="Shcolastic warning code"
-              v-model="scholastic_warning_code"
+              label="Scholastic warning code"
+              v-model="student.csl_warn_code"
               :items="scholasticWarningOptions"
+              @change="
+                () => {
+                  doSaveStudent(
+                    'csl_warn_code',
+                    student.csl_warn_code,
+                    'studentInfo',
+                    student.id
+                  );
+                }
+              "
+              item-text="description"
+              item-value="acc"
             ></v-select>
           </div>
           <div class="col-md-6">
@@ -157,22 +188,34 @@
             >
               <template v-slot:activator="{ on, attrs }">
                 <v-text-field
-                  v-model="scholastic_letter_date"
+                  :value="student.csl_letter_date?.slice(0, 10)"
                   label="Letter required date"
                   append-icon="mdi-calendar"
                   hide-details
                   readonly
                   outlined
                   dense
-              disabled
                   background-color="white"
                   v-bind="attrs"
                   v-on="on"
                 ></v-text-field>
               </template>
               <v-date-picker
-                v-model="scholastic_letter_date"
-                @input="scholastic_letter_menu = false"
+                :value="student.csl_letter_date?.slice(0, 10)"
+                @input="
+                  (e) => {
+                    student.csl_letter_date = e;
+                    scholastic_letter_menu = false;
+                  }
+                "
+                @change="
+                  doSaveStudent(
+                    'csl_letter_date',
+                    student.csl_letter_date,
+                    'studentInfo',
+                    student.id
+                  )
+                "
               ></v-date-picker>
             </v-menu>
           </div>
@@ -184,13 +227,23 @@
 
 <script>
 import store from "@/store";
-
 export default {
+  computed: {
+    application: function() {
+      return store.getters.selectedApplication;
+    },
+    student: function() {
+      return store.getters.selectedStudent;
+    },
+  },
   data: () => ({
     clearance_received_menu: null,
     scholastic_letter_menu: null,
-    scholasticWarningOptions: ["Missing class", "No homework"],
-
+    //scholasticWarningOptions: ["Missing class", "No homework"],
+    scholasticWarningOptions: [
+      { acc: "MC", description: "Missing class" },
+      { acc: "NH", description: "No homework" },
+    ],
     restrict_code: "",
     restrict_type: "",
     restrict_definition: "",
@@ -205,8 +258,18 @@ export default {
   }),
   async created() {},
   methods: {
-    doSaveStudent(field, value) {
-      store.dispatch("updateStudent", [field, value, this]);
+    doSaveStudent(field, value, type, extraId = null, addressType = "") {
+      store.dispatch("updateStudent", [
+        field,
+        value,
+        type,
+        extraId,
+        this,
+        addressType,
+      ]);
+    },
+    doSaveApp(field, value) {
+      store.dispatch("updateApplication", [field, value, this]);
     },
   },
 };
