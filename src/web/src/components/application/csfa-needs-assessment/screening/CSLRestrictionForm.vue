@@ -13,7 +13,7 @@
               background-color="white"
               hide-details
               label="Restrict / Warning Code"
-              v-model="application.warning_code.warning_code"
+              v-model="restrict_code_comp"
             ></v-text-field>
             <v-text-field
               outlined
@@ -22,7 +22,7 @@
               background-color="white"
               hide-details
               label="Type"
-              v-model="application.warning_code.code_type"
+              v-model="restrict_type_comp"
             ></v-text-field>
           </div>
           <div class="col-md-8">
@@ -33,7 +33,7 @@
               background-color="white"
               hide-details
               label="Definition"
-              v-model="application.warning_code.definition"
+              v-model="restrict_definition_comp"
             ></v-textarea>
           </div>
 
@@ -46,7 +46,7 @@
               background-color="white"
               hide-details
               label="Reason Code"
-              v-model="application.reason_code.reason_code"
+              v-model="reason_code_comp"
             ></v-text-field>
             <v-text-field
               outlined
@@ -55,7 +55,7 @@
               background-color="white"
               hide-details
               label="Type"
-              v-model="application.reason_code.reason_type"
+              v-model="reason_type_comp"
             ></v-text-field>
           </div>
           <div class="col-md-8">
@@ -66,7 +66,7 @@
               background-color="white"
               hide-details
               label="Definition"
-              v-model="application.reason_code.definition"
+              v-model="reason_definition_comp"
             ></v-textarea>
           </div>
 
@@ -137,11 +137,18 @@
             <v-text-field
               outlined
               dense
-              disabled
               background-color="white"
               hide-details
               label="CSL Over awards"
-              v-model="over_awards"
+              v-model="student.pre_over_award_amount"
+              @change="
+                doSaveStudent(
+                  'pre_over_award_amount',
+                  student.pre_over_award_amount,
+                  'studentInfo',
+                  student.id
+                )
+              "
               v-currency="{ currency: 'USD', locale: 'en' }"
             ></v-text-field>
           </div>
@@ -160,8 +167,10 @@
               background-color="white"
               hide-details
               label="Scholastic warning code"
-              v-model="student.csl_warn_code"
-              :items="scholasticWarningOptions"
+              :items="cslCodes"
+              item-text="data"
+              item-value="id"
+              v-model="warningOptions"
               @change="
                 () => {
                   doSaveStudent(
@@ -172,8 +181,6 @@
                   );
                 }
               "
-              item-text="description"
-              item-value="acc"
             ></v-select>
           </div>
           <div class="col-md-6">
@@ -227,13 +234,79 @@
 
 <script>
 import store from "@/store";
+import { mapGetters } from "vuex";
 export default {
   computed: {
+    warningOptions: {
+      get() {
+        console.log(typeof this.student.csl_warn_code);
+        return parseInt(this.student.csl_warn_code);
+      },
+      set(val) {
+        this.student.csl_warn_code = val;
+      },
+    },
+    ...mapGetters(["cslCodes"]),
     application: function() {
       return store.getters.selectedApplication;
     },
     student: function() {
       return store.getters.selectedStudent;
+    },
+    restrict_code_comp: {
+      get() {
+        if (this.application.warning_code) {
+          //return this.restrict_code;
+          return this.application.warning_code.warning_code;
+        } else {
+          return "";
+        }
+      },
+    },
+    restrict_type_comp: {
+      get() {
+        if (this.application.warning_code) {
+          return this.application.warning_code.code_type;
+        } else {
+          return "";
+        }
+      },
+    },
+    restrict_definition_comp: {
+      get() {
+        if (this.application.warning_code) {
+          return this.application.warning_code.definition;
+        } else {
+          return "";
+        }
+      },
+    },
+    reason_code_comp: {
+      get() {
+        if (this.application.reason_code) {
+          return this.application.reason_code.reason_code;
+        } else {
+          return "";
+        }
+      },
+    },
+    reason_type_comp: {
+      get() {
+        if (this.application.reason_code) {
+          return this.application.reason_code.code_type;
+        } else {
+          return "";
+        }
+      },
+    },
+    reason_definition_comp: {
+      get() {
+        if (this.application.reason_code) {
+          return this.application.reason_code.definition;
+        } else {
+          return "";
+        }
+      },
     },
   },
   data: () => ({
@@ -256,7 +329,9 @@ export default {
     scholastic_warning_code: "",
     scholastic_letter_date: null,
   }),
-  async created() {},
+  async created() {
+    store.dispatch("setCslCodes");
+  },
   methods: {
     doSaveStudent(field, value, type, extraId = null, addressType = "") {
       store.dispatch("updateStudent", [
@@ -267,6 +342,13 @@ export default {
         this,
         addressType,
       ]);
+    },
+    test() {
+      console.log(this.student.csl_warn_code);
+    },
+    concatenateText(item) {
+      // Concatenar dos cadenas de texto
+      return this.cslCodes.id + " - " + this.cslCodes.definition;
     },
     doSaveApp(field, value) {
       store.dispatch("updateApplication", [field, value, this]);

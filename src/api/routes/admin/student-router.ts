@@ -594,6 +594,7 @@ studentRouter.get(
             id: student.id,
             csl_warn_code: student.csl_warn_code,
             csl_letter_date: student.csl_letter_date,
+            pre_over_award_amount: student.pre_over_award_amount,
           };
 
           return res.status(200).json({ data });
