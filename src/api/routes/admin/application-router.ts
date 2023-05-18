@@ -148,7 +148,6 @@ applicationRouter.get("/:id",
               "reason.code_type",
               "reason.definition"
             ).where("app.id", id).first();
-
             application.parent1 = await db("sfa.person")
             .leftJoin("sfa.person_address", "sfa.person.id", "sfa.person_address.person_id")
             .select(
