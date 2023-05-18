@@ -8,7 +8,7 @@ import {
 } from "../../middleware";
 import { DB_CONFIG } from "../../config";
 import { first, orderBy } from "lodash";
-
+import axios from "axios";
 let { RequireServerAuth, RequireAdmin } = require("../auth");
 
 const db = knex(DB_CONFIG);
@@ -485,28 +485,200 @@ studentRouter.get(
               "sfa.dependent_eligibility.dependent_id"
             )
             .select(
-              "sfa.dependent_eligibility.application_id",
-              "sfa.dependent_eligibility.id as de_id",
-              "sfa.dependent_eligibility.is_csg_eligible",
-              "sfa.dependent_eligibility.is_csl_eligible",
-              "sfa.dependent_eligibility.is_sta_eligible",
-              "sfa.dependent_eligibility.is_in_progress",
-              "sfa.dependent_eligibility.is_post_secondary",
-              "sfa.dependent_eligibility.is_shares_custody",
-              "sfa.dependent_eligibility.resides_with_student",
-              "sfa.dependent_eligibility.shares_custody_details",
-              "sfa.dependent.birth_date",
-              "sfa.dependent.comments",
-              "sfa.dependent.first_name",
-              "sfa.dependent.id as d_id",
-              "sfa.dependent.is_conversion",
-              "sfa.dependent.is_disability",
-              "sfa.dependent.is_in_progress",
-              "sfa.dependent.last_name",
-              "sfa.dependent.relationship_id",
-              "sfa.dependent.student_id"
+                "sfa.student.*",
+                db.raw("sfa.fn_get_pre_leg_sta_up_weeks(student.id) AS pre_leg_sta_up_weeks"),
+                db.raw("sfa.fn_get_pre_leg_outside_travel(student.id) AS pre_leg_outside_travel"),
+                db.raw("sfa.fn_get_yea_total(student.yukon_id) - sfa.fn_get_system_yea_used(student.id) AS yea_balance"),
+                db.raw(`
+                        sfa.fn_get_prev_pre_leg_weeks(
+                            student.id,
+                            (	
+                                SELECT TOP 1 
+                                id  FROM sfa.application WHERE student_id = student.id 
+                                ORDER BY academic_year_id DESC
+                            )
+                        ) AS prev_pre_leg_weeks
+                    `),
+                db.raw(`
+                    sfa.fn_get_funded_years_used_preleg_chg(
+                        student.id, 
+                        (	
+                            SELECT TOP 1 
+                            id  FROM sfa.application WHERE student_id = student.id 
+                            ORDER BY academic_year_id DESC
+                        )
+                    ) AS funded_years_used_preleg_chg
+                `),
+                db.raw("sfa.fn_get_post_leg_sta_up_weeks(student.id) AS post_leg_sta_up_weeks"),
+                db.raw("sfa.fn_get_post_leg_weeks(student.id) AS post_leg_weeks"),
+                db.raw("sfa.fn_get_pre_leg_weeks(student.id) AS pre_leg_weeks"),
+                db.raw("sfa.fn_get_post_leg_outside_travel(student.id) AS post_leg_outside_travel"),
             )
-            .where({ student_id: id });
+            .first();
+
+            if (student) {
+
+                const person = await db("sfa.person").where({ id: student.person_id }).first();
+
+                if (person) {
+                    const applicationInfo = await db("sfa.application")
+                        .innerJoin("sfa.institution_campus", "application.institution_campus_id", "institution_campus.id")
+                        .innerJoin("sfa.institution", "institution.id", "institution_campus.institution_id")
+                        .select("application.*").select("institution.name as institution_name")
+                        .where({ student_id: id }).orderBy("academic_year_id", "desc");
+
+                    for (let item of applicationInfo) {
+                        item.title = `${item.academic_year_id}: ${item.institution_name}`;
+                    }
+
+                    const consentInfo = await db("sfa.student_consent")
+                        .where({ student_id: id });
+                    
+                        const vendorUpdates = await db("sfa.vendor_update")
+                        .where({ student_id: id });
+
+                    const residenceInfo = await db("sfa.residence")
+                        .where({ student_id: id });
+
+                    const dependentInfo = await db("sfa.dependent")
+                        .leftJoin(
+                            "sfa.dependent_eligibility",
+                            "sfa.dependent.id",
+                            "sfa.dependent_eligibility.dependent_id"
+                        )
+                        .select(
+                            "sfa.dependent_eligibility.application_id",
+                            "sfa.dependent_eligibility.id as de_id",
+                            "sfa.dependent_eligibility.is_csg_eligible",
+                            "sfa.dependent_eligibility.is_csl_eligible",
+                            "sfa.dependent_eligibility.is_sta_eligible",
+                            "sfa.dependent_eligibility.is_in_progress",
+                            "sfa.dependent_eligibility.is_post_secondary",
+                            "sfa.dependent_eligibility.is_shares_custody",
+                            "sfa.dependent_eligibility.resides_with_student",
+                            "sfa.dependent_eligibility.shares_custody_details",
+                            "sfa.dependent.birth_date",
+                            "sfa.dependent.comments",
+                            "sfa.dependent.first_name",
+                            "sfa.dependent.id as d_id",
+                            "sfa.dependent.is_conversion",
+                            "sfa.dependent.is_disability",
+                            "sfa.dependent.is_in_progress",
+                            "sfa.dependent.last_name",
+                            "sfa.dependent.relationship_id",
+                            "sfa.dependent.student_id",
+                        )
+                        .where({ student_id: id });
+
+                    const temporalAddress = await db("sfa.person_address")
+                        .where({ person_id: student.person_id })
+                        .where({ address_type_id: 2 })
+                        .orderBy("id", "DESC")
+                        .first();
+
+                    const permanentAddress = await db("sfa.person_address")
+                        .where({ person_id: student.person_id })
+                        .where({ address_type_id: 1 })
+                        .orderBy("id", "DESC")
+                        .first();
+
+                    const educationInfo = await db("sfa.education")
+                        .leftJoin(
+                            "sfa.institution_campus",
+                            "sfa.education.institution_campus_id",
+                            "sfa.institution_campus.id"
+                        )
+                        .select(
+                            "sfa.education.id",
+                            "sfa.education.from_year",
+                            "sfa.education.from_month",
+                            "sfa.education.to_year",
+                            "sfa.education.to_month",
+                            "sfa.education.study_area_id",
+                            "sfa.education.institution_campus_id",
+                            "sfa.institution_campus.institution_id",
+                        )
+                        .where(
+                            "sfa.education.student_id",
+                            student.id
+                        );
+
+                    const yeaList = await db("sfa.student")
+                        .innerJoin(
+                            "sfa.yea",
+                            "sfa.student.yukon_id",
+                            "sfa.yea.yukon_id"
+                        )
+                        .select(
+                            "sfa.yea.*"
+                        )
+                        .where(
+                            "sfa.yea.yukon_id",
+                            student.yukon_id
+                        );
+
+                    let highSchoolInfo = {
+                        city_id: null,
+                        province_id: null,
+                        country_id: null,
+                    };
+                    
+                    if (student?.high_school_id !== null && !isNaN(student?.high_school_id)) {
+
+                        const resultsHighSchoolInfo = await db("sfa.high_school")
+                            .where({ id: student.high_school_id })
+                            .first();
+
+                        if (resultsHighSchoolInfo) {
+                            highSchoolInfo = { ...resultsHighSchoolInfo };
+                        }
+
+                    }
+
+                    const data = {
+                        ...person,
+                        temporalAddress: { ...temporalAddress },
+                        permanentAddress: { ...permanentAddress },
+                        locator_number: student.locator_number,
+                        yukon_id: student.yukon_id,
+                        pre_funded_year: student.pre_funded_year,
+                        adj_yg_funding_weeks: student.adj_yg_funding_weeks || 0,
+                        pre_funding_years_used: student.pre_funding_years_used,
+                        adj_sta_upgrading_weeks: student.adj_sta_upgrading_weeks,
+                        adj_outside_travel_cnt: student.adj_outside_travel_cnt,
+                        checked_for_yukon_id: student.checked_for_yukon_id,
+                        pre_leg_sta_up_weeks: student.pre_leg_sta_up_weeks || 0,
+                        post_leg_outside_travel: student.post_leg_outside_travel || 0,
+                        pre_leg_outside_travel: student.pre_leg_outside_travel,
+                        yea_expiry_date: student.yea_expiry_date,
+                        vendor_id: student.vendor_id,
+                        is_crown_ward: student.is_crown_ward,
+                        high_school_final_grade: student.high_school_final_grade,
+                        high_school_left_year: student.high_school_left_year,
+                        high_school_left_month: student.high_school_left_month,
+                        education_level_id: student.education_level_id,
+                        high_school_id: student.high_school_id,
+                        high_school_info: highSchoolInfo,
+                        education_info: educationInfo,
+                        consent_info: consentInfo,
+                        dependent_info: dependentInfo,
+                        residence_info: residenceInfo,
+                        yea_list: yeaList,
+                        applications: applicationInfo,
+                        id: student.id,
+                        vendor_updates: vendorUpdates,
+                        yea_balance: student.yea_balance,
+                        prev_pre_leg_weeks: student.prev_pre_leg_weeks,
+                        funded_years_used_preleg_chg: student.funded_years_used_preleg_chg,
+                        post_leg_weeks: student.post_leg_weeks,
+                        pre_leg_weeks: student.pre_leg_weeks,
+                        post_leg_sta_up_weeks: student.post_leg_sta_up_weeks,
+                    };
+
+                    return res.status(200).json({ data });
+                }
+            }
+
 
           const temporalAddress = await db("sfa.person_address")
             .where({ person_id: student.person_id })
@@ -1258,6 +1430,160 @@ studentRouter.get(
       data: [{ appliation_id: 1123, institution_name: "HAPPY TOWN" }],
     });
   }
+);
+
+studentRouter.get("/:student_id/vendor",
+[param("student_id").isInt().notEmpty()], ReturnValidationErrors,
+    async (req: Request, res: Response) => {
+        
+        try {
+            let { student_id } = req.params;
+
+            const student = await db("sfa.student")
+            .where({ id: student_id }).first();
+
+            if (student && Boolean(student?.vendor_id)) {
+                
+                const vendor = await axios.get(
+                        'https://api.gov.yk.ca/finance/api/v1/vendor/'+(student.vendor_id),
+                        {
+                            headers: { 
+                                    "Ocp-Apim-Subscription-Key": "593e9b12bfb747db862429c0a935482c",
+                                },
+                        },
+                    );
+
+                if (vendor?.status === 200) {
+                    return res.status(200).json({ success: true, data: { ...vendor.data }, });
+                } else {
+                    return res.status(404).send();
+                }
+
+            } else {
+
+                return res.status(404).send();
+
+            }
+
+        } catch (error: any) {
+            console.log(error);
+            return res.status(404).send();
+        }
+        
+    }
+);
+
+studentRouter.get("/:student_id/vendor-list",
+[param("student_id").isInt().notEmpty()], ReturnValidationErrors,
+    async (req: Request, res: Response) => {
+        
+        try {
+            let { student_id } = req.params;
+
+            const student = await db("sfa.student")
+            .where({ id: student_id }).first();
+
+            if (student) {
+                
+                const vendorList = await axios.post(`https://api.gov.yk.ca/finance/api/v1/vendor/search`, { term: "all"}, { 
+                    headers: { "Ocp-Apim-Subscription-Key": "593e9b12bfb747db862429c0a935482c" },
+                });
+                
+                if (vendorList?.status === 200) {
+                    return res.status(200).json({ success: true, data: { ...vendorList.data }, });
+                } else {
+                    return res.status(404).send();
+                }
+
+            } else {
+
+                return res.status(404).send();
+
+            }
+
+        } catch (error: any) {
+            console.log(error);
+            return res.status(404).send();
+        }
+        
+    }
+);
+
+studentRouter.post("/:student_id/vendor-update",
+    [
+        param("student_id").isInt().notEmpty(),
+        body('data.address_type_id').notEmpty().withMessage("Address Type is required"),
+        body('data.vendor_id').notEmpty().withMessage("Vendor Id is required"),
+    ],
+    ReturnValidationErrorsCustomMessage,
+    async (req: Request, res: Response) => {
+        try {
+            const { student_id } = req.params;
+            const { data } = req.body;
+
+            const student: any = await db("sfa.student").where({ id: student_id }).first();
+
+            if (student) {
+                
+                const resInsert = await db("sfa.vendor_update")
+                    .insert({ ...data, student_id });
+
+                return resInsert ?
+                    res.json({ messages: [{ variant: "success", text: "Saved" }] })
+                    :
+                    res.json({ messages: [{ variant: "error", text: "Failed" }] });
+
+            }
+
+            return res.status(404).send({ messages: [{ variant: "error", text: "Failed" }] });
+
+        } catch (error) {
+            console.error(error);
+            return res.status(400).send({ messages: [{ variant: "error", text: "Failed", error }] });
+        }
+    }
+);
+
+studentRouter.patch("/:student_id/vendor-update/:id",
+    [
+        param("student_id").isInt().notEmpty(),
+        param("id").isInt().notEmpty(),
+    ],
+    ReturnValidationErrors,
+    async (req: Request, res: Response) => {
+        try {
+            const { student_id, id } = req.params;
+            const { data } = req.body;
+
+
+
+            const student: any = await db("sfa.student").where({ id: student_id }).first();
+
+            if (student) {
+                if (Object.keys(data).some(value => value === "address_type_id")) {
+                    if (!data.address_type_id) {
+                        return res.json({ messages: [{ variant: "error", text: "Address Type is required" }] });
+                    }
+                }
+                const resUpdate = await db("sfa.vendor_update")
+                    .where("id", id)
+                    .where("student_id", student_id)
+                    .update({ ...data, student_id });
+
+                return resUpdate > 0 ?
+                    res.json({ messages: [{ variant: "success", text: "Saved" }] })
+                    :
+                    res.json({ messages: [{ variant: "error", text: "Failed" }] });
+
+            }
+
+            return res.status(404).send({ messages: [{ variant: "error", text: "Failed" }] });
+
+        } catch (error) {
+            console.error(error);
+            return res.status(400).send({ messages: [{ variant: "error", text: "Failed", error }] });
+        }
+    }
 );
 
 async function insertStudent(student: any) {
