@@ -11,8 +11,19 @@
               background-color="white"
               hide-details
               label="Accommodation type"
-              v-model="study.housing"
+              v-model="application.prestudy_accom_code"
               :items="housingOptions"
+              @change="
+                () => {
+                  doSaveApp(
+                    'prestudy_accom_code',
+                    application.prestudy_accom_code
+                  );
+                  logSelectedOption();
+                }
+              "
+              item-text="description"
+              item-value="id"
             ></v-select>
           </div>
           <div class="col-md-4">
@@ -22,8 +33,14 @@
               background-color="white"
               hide-details
               label="Amount of rent paid to parents (receipts may be requested)"
-              v-model="study.rent"
+              v-model="application.prestudy_board_amount"
               v-currency="{ currency: 'USD', locale: 'en' }"
+              @change="
+                doSaveApp(
+                  'prestudy_board_amount',
+                  application.prestudy_board_amount
+                )
+              "
             ></v-text-field>
           </div>
           <div class="col-md-4 pt-0">
@@ -33,7 +50,9 @@
               hide-details
               label="I own my home"
               v-model="application.prestudy_own_home"
-              @change="doSaveApp('prestudy_own_home', application.prestudy_own_home)"
+              @change="
+                doSaveApp('prestudy_own_home', application.prestudy_own_home)
+              "
             ></v-switch>
           </div>
 
@@ -45,11 +64,12 @@
               hide-details
               label="City"
               v-model="application.prestudy_city_id"
-              @change="doSaveApp('prestudy_city_id', application.prestudy_city_id)"
+              @change="
+                doSaveApp('prestudy_city_id', application.prestudy_city_id)
+              "
               :items="cities"
               item-text="description"
               item-value="id"
-
             ></v-autocomplete>
           </div>
           <div class="col-md-6">
@@ -60,7 +80,12 @@
               hide-details
               label="Province"
               v-model="application.prestudy_province_id"
-              @change="doSaveApp('prestudy_province_id', application.prestudy_province_id)"
+              @change="
+                doSaveApp(
+                  'prestudy_province_id',
+                  application.prestudy_province_id
+                )
+              "
               :items="provinces"
               item-text="description"
               item-value="id"
@@ -72,6 +97,13 @@
               dense
               hide-details
               label="Living with spouse (see Spouse data)"
+              v-model="application.prestudy_living_w_spouse"
+              @change="
+                doSaveApp(
+                  'prestudy_living_w_spouse',
+                  application.prestudy_living_w_spouse
+                )
+              "
             ></v-switch>
           </div>
           <div class="col-md-4 pt-0">
@@ -93,7 +125,9 @@
               label="If no, distance from school/work (km)"
               @keypress="validate.isNumber($event)"
               v-model="application.prestudy_distance"
-              @change="doSaveApp('prestudy_distance', application.prestudy_distance)"
+              @change="
+                doSaveApp('prestudy_distance', application.prestudy_distance)
+              "
             ></v-text-field>
           </div>
         </div>
@@ -111,8 +145,13 @@
               background-color="white"
               hide-details
               label="Accommodation type"
-              v-model="study.housing"
+              v-model="application.study_accom_code"
               :items="housingOptions"
+              @change="
+                doSaveApp('study_accom_code', application.study_accom_code)
+              "
+              item-text="description"
+              item-value="id"
             ></v-select>
           </div>
           <div class="col-md-4">
@@ -122,8 +161,11 @@
               background-color="white"
               hide-details
               label="Amount of rent paid to parents (receipts may be requested)"
-              v-model="study.rent"
+              v-model="application.study_board_amount"
               v-currency="{ currency: 'USD', locale: 'en' }"
+              @change="
+                doSaveApp('study_board_amount', application.study_board_amount)
+              "
             ></v-text-field>
           </div>
           <div class="col-md-4 pt-0">
@@ -159,7 +201,9 @@
               hide-details
               label="Province"
               v-model="application.study_province_id"
-              @change="doSaveApp('study_province_id', application.study_province_id)"
+              @change="
+                doSaveApp('study_province_id', application.study_province_id)
+              "
               :items="provinces"
               item-text="description"
               item-value="id"
@@ -172,7 +216,12 @@
               hide-details
               label="Living with spouse (see Spouse data)"
               v-model="application.study_living_w_spouse"
-              @change="doSaveApp('study_living_w_spouse', application.study_living_w_spouse)"
+              @change="
+                doSaveApp(
+                  'study_living_w_spouse',
+                  application.study_living_w_spouse
+                )
+              "
             ></v-switch>
           </div>
           <div class="col-md-4 pt-0">
@@ -204,15 +253,33 @@
 </template>
 
 <script>
-import store from '@/store';
-import { mapGetters } from 'vuex';
+import store from "@/store";
+import { mapGetters } from "vuex";
 import validator from "@/validator";
 export default {
   data: () => ({
     provinceOptions: ["Yukon", "British Columbia"],
-    housingOptions: ["Living at Parents", "Living on Own", "Both"],
+    housingOptions: [
+      { id: 1, description: "Living at Parents" },
+      { id: 2, description: "Living on Own" },
+      { id: 3, description: "Both" },
+    ],
+
+    prestudy: {
+      housing: "",
+      housingId: 0,
+      rent: 0,
+      own: false,
+      city: "",
+      province: "",
+      living_with_spouse: false,
+      bus_available: false,
+      distance_from_school: 0,
+    },
+
     study: {
       housing: "",
+      housingId: 0,
       rent: 0,
       own: false,
       city: "",
@@ -225,7 +292,7 @@ export default {
   }),
   computed: {
     ...mapGetters(["cities", "provinces"]),
-    application: function () {
+    application: function() {
       return store.getters.selectedApplication;
     },
   },
@@ -233,11 +300,13 @@ export default {
     store.dispatch("setCities");
     store.dispatch("setProvinces");
     this.validate = { ...validator };
-    
   },
   methods: {
     doSaveApp(field, value) {
       store.dispatch("updateApplication", [field, value, this]);
+    },
+    logSelectedOption() {
+      console.log(`Selected option: ${this.prestudy.housing}`);
     },
   },
 };
