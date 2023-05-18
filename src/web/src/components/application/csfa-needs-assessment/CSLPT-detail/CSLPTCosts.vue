@@ -490,10 +490,5 @@ export default {
     }
   }
 
-  .v-main{
-    padding: 70px 0px 0px 0px !important;
-  }
-  .v-navigation-drawer{
-    display: none !important;
-  }
+
 </style>
