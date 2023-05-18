@@ -18,8 +18,7 @@
                   doSaveApp(
                     'prestudy_accom_code',
                     application.prestudy_accom_code
-                  );
-                  logSelectedOption();
+                  );                  
                 }
               "
               item-text="description"
@@ -44,7 +43,7 @@
             ></v-text-field>
           </div>
           <div class="col-md-4 pt-0">
-            <v-switch
+            <v-switch          
               outlined
               dense
               hide-details
@@ -264,7 +263,6 @@ export default {
       { id: 2, description: "Living on Own" },
       { id: 3, description: "Both" },
     ],
-
     prestudy: {
       housing: "",
       housingId: 0,
@@ -287,7 +285,7 @@ export default {
       living_with_spouse: false,
       bus_available: false,
       distance_from_school: 0,
-    },
+    },    
     validate: {},
   }),
   computed: {

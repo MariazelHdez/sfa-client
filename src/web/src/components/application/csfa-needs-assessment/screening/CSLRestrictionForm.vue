@@ -343,11 +343,7 @@ export default {
         addressType,
       ]);
     },
-    test() {
-      console.log(this.student.csl_warn_code);
-    },
-    concatenateText(item) {
-      // Concatenar dos cadenas de texto
+    concatenateText(item) {      
       return this.cslCodes.id + " - " + this.cslCodes.definition;
     },
     doSaveApp(field, value) {
