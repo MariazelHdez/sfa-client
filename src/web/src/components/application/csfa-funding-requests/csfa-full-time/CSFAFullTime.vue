@@ -33,18 +33,18 @@
                 </v-autocomplete>
             </div>
             <div class="col-md-6">
-                <v-text-field
+                <v-select
                     outlined 
                     dense 
                     background-color="white" 
                     hide-details
-                    disabled
-                    :value="cslClassifications.find(cc => cc.id === application?.csl_classification)?.description || 'CSL Classification'"
+                    v-model="application.csl_classification"
+                    @change="doSaveApp('csl_classification', application.csl_classification)"
                     :items="cslClassifications"
                     item-text="description"
                     item-value="id"
                 >
-                </v-text-field>
+                </v-select>
             </div>
             <div class="col-md-6">
                 <div class="row">
@@ -54,9 +54,9 @@
                             class="my-0"
                             label="Full amount requested"
                             v-model="CSFAFullTimeRequest.is_csl_full_amount"
-                            @change="updateFundingRequest({
-                                is_csl_full_amount: CSFAFullTimeRequest.is_csl_full_amount
-                            }, CSFAFullTimeRequest.id)"
+                            @change="e => {
+                                toggleForBoth(e, 'is_csl_full_amount');
+                            }"
                         >
                         </v-switch>
                     </div>
@@ -67,9 +67,12 @@
                             dense 
                             background-color="white" 
                             hide-details 
-                            label="Requested Amount"
+                            label="Requested amount"
                             @keypress="validate.isNumber($event)"
-                            v-model="CSFAFullTimeRequest.csl_request_amount"
+                            :value="'$'+CSFAFullTimeRequest.csl_request_amount"
+                            @input="e => {
+                                CSFAFullTimeRequest.csl_request_amount = Number(e.slice(1));
+                            }"
                             @change="updateFundingRequest({
                                 csl_request_amount: CSFAFullTimeRequest.csl_request_amount
                             }, CSFAFullTimeRequest.id)"
@@ -85,34 +88,25 @@
                     background-color="white" 
                     hide-details 
                     label="Student gross income (Ln 15000)"
-                    disabled
-                    value="$0.00"
+                    :value="'$'+application.student_ln150_income"
+                    @input="e => {
+                        application.student_ln150_income = Number(e.slice(1));
+                    }"
+                    @change="doSaveApp('student_ln150_income', application.student_ln150_income)"
                 >
                 </v-text-field>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-12">
                 <v-switch 
                     :disabled="!checkCSFAFullTimeRequest"
                     class="my-0"
                     label="Applied for Canada Student Grant Only"
                     v-model="CSFAFullTimeRequest.is_csg_only"
-                    @change="updateFundingRequest({
-                        is_csg_only: CSFAFullTimeRequest.is_csg_only
-                    }, CSFAFullTimeRequest.id)"
+                    @change="e => {
+                            toggleForBoth(e, 'is_csg_only');
+                    }"
                 >
                 </v-switch>
-            </div>
-            <div class="col-md-6">
-                <v-text-field 
-                    outlined 
-                    dense 
-                    background-color="white" 
-                    hide-details 
-                    label="Overaward from previous application"
-                    disabled
-                    value="<$325.00>"
-                >
-                </v-text-field>
             </div>
 
             <!-- QUESTIONS -->
@@ -257,10 +251,30 @@ export default {
 
             return request || {};
         },
+        GrantFullTimeRequest: function () {
+            const request = this.application
+                ?.funding_requests
+                ?.find(fr => fr.request_type_id === 35);
+
+            //this.checkGrantFullTimeRequest = !!request;
+
+            return request || {};
+        },
+        GrantTopUpFullTimeRequest: function () {
+            const request = this.application
+                ?.funding_requests
+                ?.find(fr => fr.request_type_id === 28);
+
+            //this.checkGrantTopUpFullTimeRequest = !!request;
+
+            return request || {};
+        },
     },
     data: () => ({
         itemOptions: [{text: 'Yes', value: true}, {text: 'No', value: false}],
         checkCSFAFullTimeRequest: false,
+        //checkGrantFullTimeRequest: false,
+        //checkGrantTopUpFullTimeRequest: false,
         validate: {},
     }),
     async created() {
@@ -308,12 +322,68 @@ export default {
             );
             
         },
-        async addFundingRequest() {
+        async deleteBothRecord(idGrant, idGranTopUp) {
+            try {
+                const resDeleteG = await axios.delete(
+                APPLICATION_URL+`/${idGrant}/status`,
+                );
+
+                const resDeleteGTU = await axios.delete(
+                APPLICATION_URL+`/${idGranTopUp}/status`,
+                );
+
+                const messageG = resDeleteG.data.messages[0];
+                const messageGTU = resDeleteGTU.data.messages[0];
+
+                if (messageG.variant === "success" && messageGTU.variant === "success") {
+                    this.$emit("showSuccess", messageG.text);
+                    this.checkCSFAFullTimeRequest = false;
+                } else {
+                    this.$emit("showError", messageG.text);
+                }
+            } catch (error) {
+                this.$emit("showError", "Error to delete");
+            } finally {
+                store.dispatch("loadApplication", this.application.id);
+            }
+        },
+        removeBothRecord(requestType) {
+            this.$refs.confirm.show(
+                    "Are you sure?",
+                    "Click 'Confirm' below to permanently remove this funding record.",
+                () => {
+                    this.deleteBothRecord(this.GrantFullTimeRequest.id, this.GrantTopUpFullTimeRequest.id);
+                    if (requestType === "is_csl_full_amount") {
+                        this.updateFundingRequest({
+                            is_csl_full_amount: this.CSFAFullTimeRequest.is_csl_full_amount
+                        }, this.CSFAFullTimeRequest.id);
+                    }
+                    if (requestType === "is_csg_only") {
+                        this.updateFundingRequest({
+                            is_csg_only: this.CSFAFullTimeRequest.is_csg_only
+                        }, this.CSFAFullTimeRequest.id);
+                    }
+                    
+                },
+                () => {
+                }
+            );
+            
+        },
+        async addFundingRequest(type = null, typeTwo = null) {
             try {
                 const resInsert = await axios.post(
                     APPLICATION_URL+`/${this.application.id}/status`,
-                    { request_type_id: 4, received_date: new Date(),},
+                    { request_type_id: type, received_date: new Date(),},
                 );
+
+                if (typeTwo === 35 || typeTwo === 28) {
+                    const resInsert = await axios.post(
+                        APPLICATION_URL+`/${this.application.id}/status`,
+                        { request_type_id: typeTwo, received_date: new Date(),},
+                    ); 
+                }
+
                 const message = resInsert?.data?.messages[0];
 
                 if (message?.variant === "success") {
@@ -354,9 +424,43 @@ export default {
                 this.removeRecord();
             } else {
                 if (!this.CSFAFullTimeRequest?.id) {
-                    this.addFundingRequest();
+                    this.addFundingRequest(4);
                 }
             }
+        },
+        toggleForBoth(event, requestType = "") {
+            if (!event && (this.GrantFullTimeRequest?.id && this.GrantTopUpFullTimeRequest?.id)) {
+                this.removeBothRecord(requestType);
+            } else {
+                if (event && (!this.GrantFullTimeRequest?.id && !this.GrantTopUpFullTimeRequest?.id)) {
+                    this.addFundingRequest(28, 35);
+                    if (requestType === "is_csl_full_amount") {
+                    this.updateFundingRequest({
+                            is_csl_full_amount: this.CSFAFullTimeRequest.is_csl_full_amount
+                        }, this.CSFAFullTimeRequest.id);
+                    }
+                    if (requestType === "is_csg_only") {
+                        this.updateFundingRequest({
+                            is_csg_only: this.CSFAFullTimeRequest.is_csg_only
+                        }, this.CSFAFullTimeRequest.id);
+                    }
+                }else if (
+                    event && (!!this.GrantFullTimeRequest?.id && !!this.GrantTopUpFullTimeRequest?.id)
+                    || !event && (!this.GrantFullTimeRequest?.id && !this.GrantTopUpFullTimeRequest?.id)
+                ) {
+                    if (requestType === "is_csl_full_amount") {
+                        this.updateFundingRequest({
+                            is_csl_full_amount: this.CSFAFullTimeRequest.is_csl_full_amount
+                        }, this.CSFAFullTimeRequest.id);
+                    }
+                    if (requestType === "is_csg_only") {
+                        this.updateFundingRequest({
+                            is_csg_only: this.CSFAFullTimeRequest.is_csg_only
+                        }, this.CSFAFullTimeRequest.id);
+                    }
+                }
+            }
+            
         },
     },
 };
