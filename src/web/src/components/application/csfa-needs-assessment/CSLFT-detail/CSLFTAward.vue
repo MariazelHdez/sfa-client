@@ -1,10 +1,10 @@
 <template>
-  <div class="home cslpt-base-assessment">
+  <div class="home cslft-award-assessment">
     <v-card class="default mb-5 bg-color-blue" v-for="item, index in application.funding_requests" :key="index">
       <v-card-text class="nopadding d-flex flex-wrap top-margin low-margin">
         <div class="col-xs-12 col-sm-12 col-lg-12 nopadding d-flex flex-wrap">
           <div class="col-xs-12 col-lg-12 nopadding d-flex mobile-column-flex flex-wrap">
-            <div class="col-xs-12 col-lg-12 nopadding d-flex mobile-column-flex flex-wrap low-margin">
+            <div class="col-xs-12 col-lg-12 nopadding d-flex mobile-column-flex flex-wrap low-marginx2">
               <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 nopadding d-flex flex-wrap mobile-low-margin">
                 <div class="col-xs-12 col-sm-7 col-lg-7 nopadding d-flex flex-wrap">
                   <div class="col-xs-12 col-lg-12">
@@ -24,11 +24,38 @@
                       dense
                       background-color="white"
                       hide-details
-                      label="Outstanding Loans"
+                      label="Total Resources"
                       @keypress="validate.isNumber($event)"
-                      v-model="outstanding_loans"
+                      v-model="total_resources"
                     ></v-text-field>
                   </div>
+                  <div class="col-xs-12 col-lg-12">
+                    <v-text-field
+                      outlined
+                      dense
+                      background-color="white"
+                      hide-details
+                      label="Assessed Need"
+                      @keypress="validate.isNumber($event)"
+                      v-model="assessed_need"
+                    ></v-text-field>
+                  </div>
+                  <div class="col-xs-12 col-lg-12">
+                    <v-text-field
+                      outlined
+                      dense
+                      background-color="white"
+                      hide-details
+                      label="60% of Assessed Need"
+                      @keypress="validate.isNumber($event)"
+                      v-model="sixty_percent_assessed_need"
+                    ></v-text-field>
+                  </div>
+                </div>
+                <div class="col-xs-12 col-sm-5 col-lg-5 nopadding d-flex flex-wrap">
+                  <div class="col-xs-12 col-lg-12 line-jump-height not-displayed-sx"></div>
+                  <div class="col-xs-12 col-lg-12 line-jump-height not-displayed-sx"></div>
+                  <div class="col-xs-12 col-lg-12 line-jump-height not-displayed-sx"></div>
                   <div class="col-xs-12 col-lg-12">
                     <v-text-field
                       outlined
@@ -41,14 +68,10 @@
                     ></v-text-field>
                   </div>
                 </div>
-                <div class="col-xs-12 col-sm-5 col-lg-5 nopadding d-flex flex-wrap">
-                  <div class="col-xs-12 col-lg-12 line-jump-height not-displayed-sx"></div>
-                  <div class="col-xs-12 col-lg-12 line-jump-height not-displayed-sx"></div>
-                  <div class="col-xs-12 col-lg-12 line-jump-height not-displayed-sx"></div>
-                </div>
               </div>
               <div class="col-xs-12 col-sm-2 col-md-2 col-lg-2 nopadding d-flex flex-wrap mobile-low-margin">
                 <div class="col-xs-12 col-sm-12 col-lg-12 nopadding d-flex flex-wrap">
+                  <div class="col-xs-12 col-lg-12 line-jump-height not-displayed-sx"></div>
                   <div class="col-xs-12 col-lg-12 line-jump-height not-displayed-sx"></div>
                   <div class="col-xs-12 col-lg-12 line-jump-height not-displayed-sx"></div>
                   <div class="col-xs-12 col-lg-12">
@@ -66,6 +89,7 @@
               </div>
               <div class="col-xs-12 col-sm-2 col-md-2 col-lg-2 nopadding d-flex flex-wrap mobile-low-margin">
                 <div class="col-xs-12 col-sm-12 col-lg-12 nopadding d-flex flex-wrap">
+                  <div class="col-xs-12 col-lg-12 line-jump-height not-displayed-sx"></div>
                   <div class="col-xs-12 col-lg-12 line-jump-height not-displayed-sx"></div>
                   <div class="col-xs-12 col-lg-12 line-jump-height not-displayed-sx"></div>
                   <div class="col-xs-12 col-lg-12">
@@ -104,7 +128,7 @@
                 </div>
               </div>
             </div>
-            <div class="col-xs-12 col-lg-12 nopadding d-flex mobile-column-flex flex-wrap low-margin">
+            <div class="col-xs-12 col-lg-12 nopadding d-flex mobile-column-flex flex-wrap">
               <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 nopadding d-flex flex-wrap mobile-low-margin">
                 <div class="col-xs-12 col-sm-7 col-lg-7 nopadding d-flex flex-wrap">
                   <div class="col-xs-12 col-lg-12">
@@ -457,10 +481,10 @@ export default {
   .v-btn:not(.v-btn--round).v-size--default{
     padding: 0 8px !important;
   }
-  .cslpt-base-assessment .right-block-container > div{
+  .cslft-award-assessment .right-block-container > div{
     border-left: 0px;
   }
-  .cslpt-base-assessment .right-block-container{
+  .cslft-award-assessment .right-block-container{
     border-left: 1px solid #ccc;
     margin-bottom: 20px;
   }
@@ -483,12 +507,12 @@ export default {
   .justify-center{
     justify-content: center !important;
   }
-  .cslpt-base-assessment .right-block-container img{
+  .cslft-award-assessment .right-block-container img{
     max-height: 80px !important;
     padding-right: 10px;
   }
   @media (max-width: 1263px) {
-    .cslpt-base-assessment .right-block-container{
+    .cslft-award-assessment .right-block-container{
       border-left: 0px;
     }
     .v-card__title{
@@ -499,7 +523,7 @@ export default {
       height: 0px;
       margin: 20px 15px;
     }
-    .cslpt-base-assessment .right-block-container .not-displayed-lg{
+    .cslft-award-assessment .right-block-container .not-displayed-lg{
       border-top: 1px solid #ccc;
     }
     .not-displayed-sx-md,

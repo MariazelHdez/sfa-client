@@ -1,5 +1,5 @@
 <template>
-  <div class="home cslpt-income-assessment">
+  <div class="home cslft-msfaa-assessment">
     <v-card class="default mb-5 bg-color-blue" v-for="item, index in application.funding_requests" :key="index">
       <v-card-text class="nopadding d-flex flex-wrap top-margin low-margin">
         <div class="col-xs-12 col-sm-12 col-lg-12 nopadding d-flex flex-wrap">
@@ -426,10 +426,10 @@ export default {
   .v-btn:not(.v-btn--round).v-size--default{
     padding: 0 8px !important;
   }
-  .cslpt-income-assessment .right-block-container > div{
+  .cslft-msfaa-assessment .right-block-container > div{
     border-left: 0px;
   }
-  .cslpt-income-assessment .right-block-container{
+  .cslft-msfaa-assessment .right-block-container{
     border-left: 1px solid #ccc;
     margin-bottom: 20px;
   }
@@ -452,12 +452,12 @@ export default {
   .justify-center{
     justify-content: center !important;
   }
-  .cslpt-income-assessment .right-block-container img{
+  .cslft-msfaa-assessment .right-block-container img{
     max-height: 80px !important;
     padding-right: 10px;
   }
   @media (max-width: 1263px) {
-    .cslpt-income-assessment .right-block-container{
+    .cslft-msfaa-assessment .right-block-container{
       border-left: 0px;
     }
     .v-card__title{
@@ -468,7 +468,7 @@ export default {
       height: 0px;
       margin: 20px 15px;
     }
-    .cslpt-income-assessment .right-block-container .not-displayed-lg{
+    .cslft-msfaa-assessment .right-block-container .not-displayed-lg{
       border-top: 1px solid #ccc;
     }
     .not-displayed-sx-md,

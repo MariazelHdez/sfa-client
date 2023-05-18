@@ -23,6 +23,7 @@ import CSFAFundingRequests from "../components/application/csfa-funding-requests
 import CSFANeedsAssessment from "../components/application/csfa-needs-assessment/CSFANeedsAssessment";
 import Documentation from "../components/application/Documentation";
 
+import CSLFT from "../components/application/csfa-needs-assessment/CSLFT";
 import CSLPT from "../components/application/csfa-needs-assessment/CSLPT";
 import CSGPTDEP from "../components/application/csfa-needs-assessment/CSGPTDEP";
 import CSGPT from "../components/application/csfa-needs-assessment/CSGPT";
@@ -254,6 +255,15 @@ const routes = [
       requiresAuth: true
     }
   },
+  {
+    path: "/application/:id/assessment/CSLFT/0",
+    name: "CSLFT",
+    component: CSLFT,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  
 
 
   {
