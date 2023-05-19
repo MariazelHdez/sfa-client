@@ -15,7 +15,7 @@
             <div class="col-md-6">
                 <div class="row my-n2">
                     <div class="col-md-6">
-                        <h3 class="text-subtitle-1 mt-1">Left High School</h3>
+                        <h3 class="text-subtitle-1 mt-1">Left high school</h3>
                     </div> 
                     <div class="col-md-3">
                         <v-text-field
@@ -44,7 +44,7 @@
                 </div>
                 <div class="row my-n2">
                     <div class="col-md-6">
-                        <h3 class="text-subtitle-1 mt-1">Current YEA Balance</h3>
+                        <h3 class="text-subtitle-1 mt-1">Current YEA balance</h3>
                     </div> 
                     <div class="col-md-6">
                         <v-text-field 
@@ -54,13 +54,14 @@
                             background-color="white" 
                             hide-details 
                             label=""
+                            v-model="student.yea_balance"
                         >
                         </v-text-field>
                     </div>
                 </div>
                 <div class="row my-n2">
                     <div class="col-md-6">
-                        <h3 class="text-subtitle-1 mt-1">YEA Requested Amount</h3>
+                        <h3 class="text-subtitle-1 mt-1">YEA requested amount</h3>
                     </div> 
                     <div class="col-md-6">
                         <v-text-field 
@@ -84,7 +85,7 @@
             <div class="col-md-6">
                 <div class="row my-n2">
                     <div class="col-md-6 d-md-flex justify-end">
-                        <h3 class="text-subtitle-1 mt-1">YEA Expire Date</h3>
+                        <h3 class="text-subtitle-1 mt-1">YEA expire date</h3>
                     </div> 
                     <div class="col-md-6">
                         <v-menu
@@ -135,7 +136,7 @@
                             block
                             color="success"
                         >
-                            VIEW RECEIPT(S)
+                        View receipt(s)
                         </v-btn>
                     </div>
                 </div>
@@ -176,7 +177,7 @@
                         dense 
                         background-color="white" 
                         hide-details 
-                        label="First Name"
+                        label="First name"
                         v-model="yea.first_name"
                     >
                     </v-text-field>
@@ -190,7 +191,7 @@
                             dense 
                             background-color="white" 
                             hide-details 
-                            label="First Name"
+                            label="First name"
                         >
                         </v-text-field>
                     </div>
@@ -206,7 +207,7 @@
                         dense 
                         background-color="white" 
                         hide-details 
-                        label="Last Name"
+                        label="Last name"
                         v-model="yea.last_name"
                     >
                     </v-text-field>
@@ -220,7 +221,7 @@
                             dense 
                             background-color="white" 
                             hide-details 
-                            label="Last Name"
+                            label="Last name"
                         >
                         </v-text-field>
                     </div>
