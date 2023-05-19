@@ -508,4 +508,3 @@ BEGIN
     RETURN COALESCE(@v_num_weeks, 0);
 END
 GO
-
