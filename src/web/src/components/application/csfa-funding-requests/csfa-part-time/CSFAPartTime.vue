@@ -33,15 +33,19 @@
                 </v-autocomplete>
             </div>
             <div class="col-md-6">
-                <v-text-field 
+                <v-select
+                    :disabled="!checkCSFAPartTimeRequest"
                     outlined 
                     dense 
                     background-color="white" 
-                    hide-details 
-                    :value="cslClassifications?.find(cc => cc.id === application?.csl_classification)?.description || 'CSL Classification'"
-                    disabled
+                    hide-details
+                    v-model="application.csl_classification"
+                    @change="doSaveApp('csl_classification', application.csl_classification)"
+                    :items="cslClassifications"
+                    item-text="description"
+                    item-value="id"
                 >
-                </v-text-field>
+                </v-select>
             </div>
             <div class="col-md-6">
                 <div class="row">
@@ -51,9 +55,7 @@
                             class="my-0"
                             label="Full amount requested"
                             v-model="CSFAPartTimeRequest.is_csl_full_amount"
-                            @change="updateFundingRequest({
-                                is_csl_full_amount: CSFAPartTimeRequest.is_csl_full_amount
-                            }, CSFAPartTimeRequest.id)"
+                            @change="toggleForBoth($event, 'is_csl_full_amount')"
                         >
                         </v-switch>
                     </div>
@@ -64,9 +66,12 @@
                             dense 
                             background-color="white" 
                             hide-details 
-                            label="Requested Amount"
+                            label="Requested amount"
                             @keypress="validate.isNumber($event)"
-                            v-model="CSFAPartTimeRequest.csl_request_amount"
+                            :value="'$'+(CSFAPartTimeRequest.csl_request_amount ?? 0)"
+                            @input="e => {
+                                CSFAPartTimeRequest.csl_request_amount = Number(e.slice(1));
+                            }"
                             @change="updateFundingRequest({
                                 csl_request_amount: CSFAPartTimeRequest.csl_request_amount
                             }, CSFAPartTimeRequest.id)"
@@ -77,13 +82,18 @@
             </div>
             <div class="col-md-6">
                 <v-text-field 
+                    :disabled="!checkCSFAPartTimeRequest"
                     outlined 
                     dense 
                     background-color="white" 
                     hide-details 
                     label="Student gross income (Ln 15000)"
-                    disabled
-                    value="$0.00"
+                    @keypress="validate.isNumber($event)"
+                    :value="'$'+(application.student_ln150_income ?? 0)"
+                    @input="e => {
+                        application.student_ln150_income = Number(e.slice(1));
+                    }"
+                    @change="doSaveApp('student_ln150_income', application.student_ln150_income)"
                 >
                 </v-text-field>
             </div>
@@ -93,9 +103,7 @@
                     class="my-0"
                     label="Applied for Canada Student Grant Only"
                     v-model="CSFAPartTimeRequest.is_csg_only"
-                    @change="updateFundingRequest({
-                        is_csg_only: CSFAPartTimeRequest.is_csg_only
-                    }, CSFAPartTimeRequest.id)"
+                    @change="toggleForBoth($event, 'is_csg_only')"
                 >
                 </v-switch>
             </div>
@@ -105,9 +113,10 @@
                     dense 
                     background-color="white" 
                     hide-details 
+                    :disabled="!checkCSFAPartTimeRequest"
                     label="Outstanding principal from previous CSFA Loan"
-                    disabled
-                    value="<$325.00>"
+                    v-model="application.outstanding_cslpt_amount"
+                    @change="doSaveApp('outstanding_cslpt_amount', application.outstanding_cslpt_amount)"
                 >
                 </v-text-field>
             </div>
@@ -124,38 +133,41 @@
             <div class="col-md-6">
                 <div class="row">
                     <div class="col-md-4">
-                        <v-text-field 
-                            disabled
+                        <v-text-field
                             outlined 
                             dense 
                             background-color="white" 
                             hide-details 
                             label="% of full course load"
+                            v-model="application.percent_of_full_time"
+                            @change="doSaveApp('percent_of_full_time', application.percent_of_full_time)"
                             value="40"
                         >
                         </v-text-field>
                     </div>
                     <div class="col-md-4">
-                        <v-text-field 
+                        <v-text-field
+                            :disabled="!checkCSFAPartTimeRequest"
                             outlined 
                             dense 
                             background-color="white" 
                             hide-details 
                             label="Study Weeks"
-                            disabled
-                            value="16"
+                            v-model="application.study_weeks_count"
+                            @change="doSaveApp('study_weeks_count', application.study_weeks_count)"
                         >
                         </v-text-field>
                     </div>
                     <div class="col-md-4">
-                        <v-text-field 
-                            disabled
+                        <v-text-field
+                            :disabled="!checkCSFAPartTimeRequest"
                             outlined 
                             dense 
                             background-color="white" 
                             hide-details 
                             label="Courses/Wk"
-                            value="3"
+                            v-model="application.courses_per_week"
+                            @change="doSaveApp('courses_per_week', application.courses_per_week)"
                         >
                         </v-text-field>
                     </div>
@@ -277,61 +289,135 @@
             <div class="col-md-12 mb-n5">
                 <h3 class="text-h6 font-weight-regular">Courses</h3>
             </div>
+            <div class="col-md-12">
+                <div class="row" v-for="course, index in application.courses_enrolled" :key="index">
+                    <div class="col-md-6 pr-1">
+                        <h3 class="text-subtitle-1 text-center font-weight-bold">Course Description</h3>
+                        <v-text-field 
+                            :disabled="showAdd"
+                            outlined 
+                            dense 
+                            background-color="white" 
+                            hide-details
+                            v-model="course.description"
+                            @change="updateCourse({ description: course.description }, course.id)"
+                        >
+                        </v-text-field>
+                    </div>
+                    <div class="col-md-2 px-1">
+                        <h3 class="text-subtitle-1 text-center font-weight-bold">Course Code</h3>
+                        <v-text-field 
+                            :disabled="showAdd"
+                            outlined 
+                            dense 
+                            background-color="white" 
+                            hide-details
+                            v-model="course.course_code"
+                            @change="updateCourse({ course_code: course.course_code }, course.id)"
+                        >
+                        </v-text-field>
+                    </div>
+                    <div class="col-md-3 px-1">
+                        <h3 class="text-subtitle-1 text-center font-weight-bold">Instruction Type</h3>
+                        <v-select
+                            :disabled="showAdd"
+                            outlined 
+                            dense 
+                            background-color="white" 
+                            hide-details
+                            :items="instructionTypes"
+                            item-text="description"
+                            item-value="id"
+                            v-model="course.instruction_type_id"
+                            @change="updateCourse({ instruction_type_id: course.instruction_type_id }, course.id)"
+                        >
+                        </v-select>
+                    </div>
+                    <div class="col-md-1 mt-11 d-md-flex justify-center">
+                        <v-btn
+                            v-if="(index+1 === application.courses_enrolled.length && !showAdd)"
+                            :disabled="showAdd"
+                            color="success" 
+                            x-small
+                            fab 
+                            class="my-0"
+                            @click="showAdd = true"
+                        >
+                            <v-icon>mdi-plus</v-icon>
+                        </v-btn>
+                        <v-btn
+                            :disabled="showAdd"
+                            color="error" 
+                            x-small
+                            fab 
+                            class="my-0 ml-1"
+                            @click="removeCourse(course.id)"
+                        >
+                            <v-icon>mdi-minus</v-icon>
+                        </v-btn>
+                    </div>
+                </div>
+                <div class="row" v-if="showAdd || !application?.courses_enrolled?.length">
+                    <div class="col-md-6 pr-1">
+                        <h3 class="text-subtitle-1 text-center font-weight-bold">Course Description</h3>
+                        <v-text-field
+                            outlined 
+                            dense 
+                            background-color="white" 
+                            hide-details
+                            v-model="newRecord.description"
+                        >
+                        </v-text-field>
+                    </div>
+                    <div class="col-md-2 px-1">
+                        <h3 class="text-subtitle-1 text-center font-weight-bold">Course Code</h3>
+                        <v-text-field
+                            outlined 
+                            dense 
+                            background-color="white" 
+                            hide-details
+                            v-model="newRecord.course_code"
+                        >
+                        </v-text-field>
+                    </div>
+                    <div class="col-md-3 px-1">
+                        <h3 class="text-subtitle-1 text-center font-weight-bold">Instruction Type</h3>
+                        <v-select
+                            outlined 
+                            dense 
+                            background-color="white" 
+                            hide-details
+                            :items="instructionTypes"
+                            item-text="description"
+                            item-value="id"
+                            v-model="newRecord.instruction_type_id"
+                        >
+                        </v-select>
+                    </div>
+                    <div class="col-md-1 mt-11 d-md-flex justify-center">
+                            <v-btn
+                                color="success" 
+                                x-small
+                                fab 
+                                class="my-0"
+                                @click="addCourse"
+                            >
+                                <v-icon>mdi-check</v-icon>
+                            </v-btn>
+                            <v-btn
+                                color="error" 
+                                x-small
+                                fab 
+                                class="my-0 ml-1"
+                                @click="setClose"
+                            >
+                                <v-icon>mdi-close</v-icon>
+                            </v-btn>
+                    </div>
+                </div>
+            </div>
+
             
-            <div class="col-md-6 pr-1">
-                <h3 class="text-subtitle-1 text-center font-weight-bold">Course Description</h3>
-                <v-text-field 
-                    :disabled="!checkCSFAPartTimeRequest"
-                    outlined 
-                    dense 
-                    background-color="white" 
-                    hide-details
-                >
-                </v-text-field>
-            </div>
-            <div class="col-md-2 px-1">
-                <h3 class="text-subtitle-1 text-center font-weight-bold">Course Code</h3>
-                <v-text-field 
-                    :disabled="!checkCSFAPartTimeRequest"
-                    outlined 
-                    dense 
-                    background-color="white" 
-                    hide-details
-                >
-                </v-text-field>
-            </div>
-            <div class="col-md-3 px-1">
-                <h3 class="text-subtitle-1 text-center font-weight-bold">Instruction Type</h3>
-                <v-select
-                    :disabled="!checkCSFAPartTimeRequest"
-                    outlined 
-                    dense 
-                    background-color="white" 
-                    hide-details
-                >
-                </v-select>
-            </div>
-            <div class="col-md-1 mt-11 d-md-flex justify-center">
-                    <v-btn
-                        :disabled="!checkCSFAPartTimeRequest"
-                        color="success" 
-                        x-small
-                        fab 
-                        class="my-0"
-                    >
-                        <v-icon>mdi-plus</v-icon>
-                    </v-btn>
-                    <v-btn
-                        :disabled="!checkCSFAPartTimeRequest"
-                        color="error" 
-                        x-small
-                        fab 
-                        class="my-0 ml-1"
-                        @click="setClose"
-                    >
-                        <v-icon>mdi-minus</v-icon>
-                    </v-btn>
-            </div>
 
 
         </v-card>
@@ -346,11 +432,8 @@ import { APPLICATION_URL } from "@/urls";
 import validator from "@/validator";
 
 export default {
-    components: {
-
-    },
     computed: {
-        ...mapGetters(["cslClassifications", "provinces"]),
+        ...mapGetters(["cslClassifications", "provinces", "instructionTypes"]),
         student() {
             return store.getters.selectedStudent;
         },
@@ -366,20 +449,45 @@ export default {
 
             return request || {};
         },
+        GrantPartTimeRequest: function () {
+            const request = this.application
+                ?.funding_requests
+                ?.find(fr => fr.request_type_id === 31);
+
+            this.checkCSFAPartTimeRequest = !!request;
+
+            return request || {};
+        },
     },
     data: () => ({
         itemOptions: [{text: 'Yes', value: true}, {text: 'No', value: false}],
         checkCSFAPartTimeRequest: false,
         validate: {},
+        showAdd: false,
+        newRecord: {
+            description: "",
+            course_code: "",
+            instruction_type_id: null,
+        },
     }),
     async created() {
         this.validate = validator;
         store.dispatch("setProvinces");
+        store.dispatch("setInstructionTypes");
     },
     watch: {
 
     },
     methods: {
+        setClose() {
+            this.newRecord = {
+                description: "",
+                course_code: "",
+                instruction_type_id: null,
+            };
+
+            this.showAdd = false;
+        },
         doSaveApp(field, value) {
             store.dispatch("updateApplication", [field, value, this]);
         },
@@ -416,17 +524,79 @@ export default {
             );
             
         },
-        async addFundingRequest() {
+        async deleteCourse(id) {
+            try {
+                const resDelete = await axios.delete(
+                APPLICATION_URL+`/${id}/course`,
+                );
+
+                const message = resDelete.data.messages[0];
+
+                if (message.variant == "success") {
+                    this.$emit("showSuccess", message.text);
+                } else {
+                    this.$emit("showError", message.text);
+                }
+            } catch (error) {
+                this.$emit("showError", "Error to delete");
+            } finally {
+                store.dispatch("loadApplication", this.application.id);
+            }
+        },
+        removeCourse(id) {
+            this.$refs.confirm.show(
+                    "Are you sure?",
+                    "Click 'Confirm' below to permanently remove this course.",
+                () => {
+                    this.deleteCourse(id);
+                },
+                () => {
+
+                }
+            );
+            
+        },
+        async addFundingRequest(type) {
             try {
                 const resInsert = await axios.post(
                     APPLICATION_URL+`/${this.application.id}/status`,
-                    { request_type_id: 5, received_date: new Date(),},
+                    { request_type_id: type, received_date: new Date(),},
                 );
                 const message = resInsert?.data?.messages[0];
 
                 if (message?.variant === "success") {
                     this.$emit("showSuccess", message.text);
                     this.checkCSFAPartTimeRequest = true;
+                } else {
+                    this.$emit("showError", message.text);
+                }
+                
+            } catch (error) {
+                this.$emit("showError", "Error to insert");
+            } finally {
+                store.dispatch("loadApplication", this.application.id);
+            }
+        },
+        async addCourse() {
+            try {
+                if (!this.newRecord.description.length) {
+                    this.$emit("showError", "Description is required");
+                    return;
+                }
+                if (!this.newRecord.instruction_type_id) {
+                    this.$emit("showError", "Instruction Type is required");
+                    return;
+                }
+
+                const resInsert = await axios.post(
+                    APPLICATION_URL+`/${this.application.id}/course`,
+                    { data: { ...this.newRecord, application_id: this.application.id} },
+                );
+                const message = resInsert?.data?.messages[0];
+
+                if (message?.variant === "success") {
+                    this.$emit("showSuccess", message.text);
+                    this.setClose();
                 } else {
                     this.$emit("showError", message.text);
                 }
@@ -457,14 +627,110 @@ export default {
                 store.dispatch("loadApplication", this.application.id);
             }
         },
+        async updateCourse(itemToUpdate, id) {
+            try {
+                const resUpdate = await axios.patch(
+                    APPLICATION_URL+`/${this.application.id}/course/${id}`,
+                    { data: { ...itemToUpdate } },
+                );
+                const message = resUpdate?.data?.messages[0];
+
+                if (message?.variant === "success") {
+                    this.$emit("showSuccess", message.text);
+                } else {
+                    this.$emit("showError", message.text);
+                }
+                
+            } catch (error) {
+                this.$emit("showError", "Error to update");
+            } finally {
+                store.dispatch("loadApplication", this.application.id);
+            }
+        },
         toggle(event) {
             if (!event && this.CSFAPartTimeRequest?.id) {
                 this.removeRecord();
             } else {
                 if (!this.CSFAPartTimeRequest?.id) {
-                    this.addFundingRequest();
+                    this.addFundingRequest(5);
                 }
             }
+        },
+        toggleForBoth(event, requestType = "") {
+            if (!event && (this.GrantPartTimeRequest?.id)) {
+                this.removeBothRecord(requestType);
+            } else {
+                if (event && (!this.GrantPartTimeRequest?.id)) {
+                    this.addFundingRequest(31);
+                    if (requestType === "is_csl_full_amount") {
+                    this.updateFundingRequest({
+                            is_csl_full_amount: this.CSFAPartTimeRequest.is_csl_full_amount
+                        }, this.CSFAPartTimeRequest.id);
+                    }
+                    if (requestType === "is_csg_only") {
+                        this.updateFundingRequest({
+                            is_csg_only: this.CSFAPartTimeRequest.is_csg_only
+                        }, this.CSFAPartTimeRequest.id);
+                    }
+                }else if (
+                    event && (!!this.GrantPartTimeRequest?.id)
+                    || !event && (!this.GrantTopUpFullTimeRequest?.id)
+                ) {
+                    if (requestType === "is_csl_full_amount") {
+                        this.updateFundingRequest({
+                            is_csl_full_amount: this.CSFAPartTimeRequest.is_csl_full_amount
+                        }, this.CSFAPartTimeRequest.id);
+                    }
+                    if (requestType === "is_csg_only") {
+                        this.updateFundingRequest({
+                            is_csg_only: this.CSFAPartTimeRequest.is_csg_only
+                        }, this.CSFAPartTimeRequest.id);
+                    }
+                }
+            }
+            
+        },
+        async deleteBothRecord(id) {
+            try {
+                const resDelete = await axios.delete(
+                APPLICATION_URL+`/${id}/status`,
+                );
+
+                const message = resDelete.data.messages[0];
+
+                if (message.variant === "success") {
+                    this.$emit("showSuccess", message.text);
+                } else {
+                    this.$emit("showError", message.text);
+                }
+            } catch (error) {
+                this.$emit("showError", "Error to delete");
+            } finally {
+                store.dispatch("loadApplication", this.application.id);
+            }
+        },
+        removeBothRecord(requestType) {
+            this.$refs.confirm.show(
+                    "Are you sure?",
+                    "Click 'Confirm' below to permanently remove this funding record.",
+                () => {
+                    this.deleteBothRecord(this.GrantPartTimeRequest?.id);
+                    if (requestType === "is_csl_full_amount") {
+                        this.updateFundingRequest({
+                            is_csl_full_amount: this.CSFAPartTimeRequest.is_csl_full_amount
+                        }, this.CSFAPartTimeRequest.id);
+                    }
+                    if (requestType === "is_csg_only") {
+                        this.updateFundingRequest({
+                            is_csg_only: this.CSFAPartTimeRequest.is_csg_only
+                        }, this.CSFAPartTimeRequest.id);
+                    }
+                    
+                },
+                () => {
+                }
+            );
+            
         },
     },
 };

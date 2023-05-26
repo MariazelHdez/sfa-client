@@ -7,10 +7,10 @@
             <div class="col-md-6">
                 <v-row>
                     <div class="col-md-6">
-                        <v-btn block color="success" class="my-0">VIEW YG/STA PDEC</v-btn>
+                        <v-btn block color="success" class="my-0">View YG/STA PDEC</v-btn>
                     </div>
                     <div class="col-md-6">
-                        <v-btn block color="success" class="my-0">VIEW CSFA PDEC</v-btn>
+                        <v-btn block color="success" class="my-0">View CSFA PDEC</v-btn>
                     </div>
                 </v-row>
             </div>
@@ -21,7 +21,7 @@
                     dense 
                     background-color="white" 
                     hide-details 
-                    label="Address Line 1"
+                    label="Address line 1"
                     v-model="parent.address1"
                     @change="update({ address1: parent.address1 })"
                 >
@@ -33,7 +33,7 @@
                     dense 
                     background-color="white" 
                     hide-details 
-                    label="Address Line 2"
+                    label="Address line 2"
                     v-model="parent.address2"
                     @change="update({ address2: parent.address2 })"
                 >
@@ -76,7 +76,7 @@
                     dense 
                     background-color="white" 
                     hide-details 
-                    label="Postal Code"
+                    label="Postal code"
                     v-model="parent.postal_code"
                     @change="update({ postal_code: parent.postal_code })"
                 >

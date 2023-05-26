@@ -926,7 +926,8 @@ CREATE TABLE sfa.request_type
     show_online             BIT            NOT NULL DEFAULT 0,
     short_name              NVARCHAR(15)   NULL,
     help_url                NVARCHAR(1000) NULL,
-    help_text               TEXT           NULL
+    help_text               TEXT           NULL,
+    is_active               BIT            NOT NULL DEFAULT 0
 )
 
 -- SFAADMIN.REQUEST_REQUIREMENT
@@ -1001,11 +1002,40 @@ CREATE TABLE sfa.citizenship
 	is_active   BIT           NOT NULL DEFAULT 1
 )
 
+CREATE TABLE sfa.document_status 
+(
+	id          INT IDENTITY (1,1) PRIMARY KEY,
+	description NVARCHAR(200) NOT NULL,
+	is_active   BIT           NOT NULL DEFAULT 1
+)
+
+CREATE TABLE sfa.program_division 
+(
+	id          INT IDENTITY (1,1) PRIMARY KEY,
+	description NVARCHAR(200) NOT NULL,
+	is_active   BIT           NOT NULL DEFAULT 1
+)
+
+CREATE TABLE sfa.attendance 
+(
+	id          INT IDENTITY (1,1) PRIMARY KEY,
+	description NVARCHAR(200) NOT NULL,
+	is_active   BIT           NOT NULL DEFAULT 1
+)
+
 CREATE TABLE sfa.csl_classification (
 	id INT IDENTITY (1,1) PRIMARY KEY,
 	description NVARCHAR(200) NOT NULL,
 	is_active BIT NOT NULL DEFAULT 1
 )
+
+CREATE TABLE sfa.income_type (
+	id INT IDENTITY (1,1) PRIMARY KEY,
+	description NVARCHAR(200) NOT NULL,
+	assess_as_asset BIT NOT NULL DEFAULT 0,
+	is_active BIT NOT NULL DEFAULT 0
+)
+
 
 -- SFAADMIN.CORRESPONDENCE
 CREATE TABLE sfa.correspondence
@@ -1064,131 +1094,147 @@ CREATE TABLE sfa.student_persons
 
 CREATE TABLE sfa.application
 (
-    id                                      INT IDENTITY (1, 1) PRIMARY KEY,
-    student_id                              INT            NOT NULL REFERENCES sfa.student,
-    academic_year_id                        INT            NOT NULL REFERENCES sfa.academic_year,
-    institution_campus_id                   INT            NULL REFERENCES sfa.institution_campus,
-    study_area_id                           INT            NULL REFERENCES sfa.study_area,
-    program_id                              INT            NULL REFERENCES sfa.program,
-    aboriginal_status_id                    INT            NULL REFERENCES sfa.aboriginal_status,
-    marital_status_id                       INT            NULL REFERENCES sfa.marital_status,
-    category_id                             INT            NULL REFERENCES sfa.category,
-    first_nation_id                         INT            NULL REFERENCES sfa.first_nation,
-    spouse_id                               INT            NULL REFERENCES sfa.person,
-    parent1_id                              INT            NULL REFERENCES sfa.person,
-    parent2_id                              INT            NULL REFERENCES sfa.person,
-    parent1_income                          NUMERIC(10, 2) NULL,
-    parent1_net_income                      NUMERIC(10, 2) NULL,
-    parent1_tax_paid                        NUMERIC(10, 2) NULL,
-    parent2_income                          NUMERIC(10, 2) NULL,
-    parent2_net_income                      NUMERIC(10, 2) NULL,
-    parent2_tax_paid                        NUMERIC(10, 2) NULL,
-    school_email                            NVARCHAR(100)  NULL,
-    school_telephone                        NVARCHAR(24)   NULL,
-    spouse_hs_end_year                      INT            NULL,
-    spouse_hs_end_month                     INT            NULL,
-    spouse_prestudy_emp_status_id           INT            NULL REFERENCES sfa.prestudy_employment_status,
-    spouse_pstudy_school_from               DATE           NULL,
-    spouse_pstudy_school_to                 DATE           NULL,
-    spouse_pstudy_income_comment            TEXT           NULL,
-    spouse_study_emp_status_id              INT            NULL REFERENCES sfa.prestudy_employment_status,
-    spouse_study_school_from                DATE           NULL,
-    spouse_study_school_to                  DATE           NULL,
-    is_spouse_study_csl                     BIT            NOT NULL DEFAULT 0,
-    is_spouse_study_bus                     BIT            NOT NULL DEFAULT 0,
-    spouse_study_distance                   INT            NULL,
-    spouse_study_income_comment             TEXT           NULL,
-    classes_start_date                      DATE           NULL,
-    classes_end_date                        DATE           NULL,
-    is_correspondence                       BIT            NOT NULL DEFAULT 0,
-    is_coop_paid                            BIT            NOT NULL DEFAULT 0,
-    citizenship_status                      INT            NULL REFERENCES sfa.citizenship,
-    is_disabled                             BIT            NOT NULL DEFAULT 0,
-    is_minority                             BIT            NOT NULL DEFAULT 0,
-    student_number                          NVARCHAR(30)   NULL,
-    program_year_total                      FLOAT          NULL,
-    program_year                            FLOAT          NULL,
-    is_two_residence                        BIT            NOT NULL DEFAULT 0,
-    is_moving                               BIT            NOT NULL DEFAULT 0,
-    csl_classification                      INT            NULL REFERENCES sfa.csl_classification,
-    csl_previous_province_id                INT            NULL REFERENCES sfa.province,
-    program_division_explanation            NVARCHAR(200)  NULL,
-    prestudy_accom_code                     INT            NULL,
-    prestudy_own_home                       BIT            NOT NULL DEFAULT 0,
-    prestudy_board_amount                   NUMERIC(10, 2) NULL,
-    prestudy_city_id                        INT            NULL REFERENCES sfa.city,
-    prestudy_province_id                    INT            NULL REFERENCES sfa.province,
-    prestudy_bus                            BIT            NOT NULL DEFAULT 0,
-    prestudy_distance                       INT            NULL,
-    prestudy_employ_status_id               INT            NULL REFERENCES sfa.prestudy_employment_status,
-    study_accom_code                        INT            NULL,
-    study_own_home                          BIT            NOT NULL DEFAULT 0,
-    study_board_amount                      NUMERIC(10, 2) NULL,
-    study_city_id                           INT            NULL REFERENCES sfa.city,
-    study_province_id                       INT            NULL REFERENCES sfa.province,
-    study_bus                               BIT            NOT NULL DEFAULT 0,
-    study_distance                          INT            NULL,
-    stat_info_comment                       NVARCHAR(500)  NULL,
-    books_supplies_cost                     INT            NULL,
-    outstanding_cslpt_amount                NUMERIC(10, 2) NULL,
-    previous_csg_pt_amount                  NUMERIC(10, 2) NULL,
-    percent_of_full_time                    INT            NULL,
-    is_part_of_ft                           BIT            NOT NULL DEFAULT 0,
-    study_weeks_count                       INT            NULL,
-    class_hours_per_week                    NUMERIC(4, 1)  NULL,
-    parent_residence_comment                NVARCHAR(500)  NULL,
-    study_living_w_spouse                   BIT            NOT NULL DEFAULT 0,
-    tuition_estimate_amount                 NUMERIC(10, 2) NULL,
-    program_division                        INT            NULL,
-    is_previous_cslft                       BIT            NOT NULL DEFAULT 0,
-    is_previous_cslpt                       BIT            NOT NULL DEFAULT 0,
-    coop_start_year                         INT            NULL,
-    coop_start_month                        INT            NULL,
-    coop_end_year                           INT            NULL,
-    coop_end_month                          INT            NULL,
-    exclude_from_count                      BIT            NOT NULL DEFAULT 0,
-    is_perm_disabled                        BIT            NOT NULL DEFAULT 0,
-    disabled_equipment                      NVARCHAR(500)  NULL,
-    previous_csg_disability_amount          NUMERIC(10, 2) NULL,
-    previous_csg_fem_doc_amount             NUMERIC(10, 2) NULL,
-    credit_chk_reqd_date                    DATE           NULL,
-    credit_chk_fax_sent_date                DATE           NULL,
-    credit_chk_passed_date                  DATE           NULL,
-    credit_chk_passed                       BIT            NOT NULL DEFAULT 0,
-    credit_chk_appeal_date                  DATE           NULL,
-    credit_chk_app_comp_date                DATE           NULL,
-    credit_chk_app_comp                     BIT            NOT NULL DEFAULT 0,
-    credit_chk_comp_date                    DATE           NULL,
-    csl_clearance_date                      DATE           NULL,
-    prestudy_csl_classification             INT            NULL REFERENCES sfa.csl_classification,
-    yea_tot_receipt_amount                  NUMERIC(10, 2) NULL,
-    academic_percent                        FLOAT          NULL,
-    csl_restriction_comment                 NVARCHAR(2000) NULL,
-    in_progress_page                        INT            NULL,
-    online_start_date                       DATE           NULL,
-    online_submit_date                      DATE           NULL,
-    rem_transition_grant_years              INT            NULL,
-    student_ln150_income                    NUMERIC(10, 2) NULL,
-    spouse_ln150_income                     NUMERIC(10, 2) NULL,
-    taxes1_filed_year                       INT            NULL,
-    taxes2_filed_year                       INT            NULL,
-    taxes1_filed_province_id                INT            NULL REFERENCES sfa.province,
-    taxes2_filed_province_id                INT            NULL REFERENCES sfa.province,
-    taxes1_not_filed                        BIT            NOT NULL DEFAULT 0,
-    taxes2_not_filed                        BIT            NOT NULL DEFAULT 0,
-    taxes1_verified                         BIT            NOT NULL DEFAULT 0,
-    taxes2_verified                         BIT            NOT NULL DEFAULT 0,
-    applied_other_funding                   BIT            NOT NULL DEFAULT 0,
-    csl_restriction_warn_id                 INT            NULL REFERENCES sfa.csl_code,
-    csl_restriction_reason_id               INT            NULL REFERENCES sfa.csl_code,
-    courses_per_week                        INT            NULL,
-    prestudy_start_date                     DATE           NULL,
-    prestudy_end_date                       DATE           NULL,
-    valid_driver_license                    BIT            NULL,
-    valid_driver_license_comment            TEXT           NULL,
-    valid_yhcip                             BIT            NULL,
-    valid_yhcip_comment                     TEXT           NULL,
-    has_consent_to_share_data               BIT            NOT NULL DEFAULT 0
+    id                             INT IDENTITY (1, 1) PRIMARY KEY,
+    student_id                     INT            NOT NULL REFERENCES sfa.student,
+    academic_year_id               INT            NOT NULL REFERENCES sfa.academic_year,
+    institution_campus_id          INT            NULL REFERENCES sfa.institution_campus,
+    study_area_id                  INT            NULL REFERENCES sfa.study_area,
+    program_id                     INT            NULL REFERENCES sfa.program,
+    aboriginal_status_id           INT            NULL REFERENCES sfa.aboriginal_status,
+    marital_status_id              INT            NULL REFERENCES sfa.marital_status,
+    category_id                    INT            NULL REFERENCES sfa.category,
+    first_nation_id                INT            NULL REFERENCES sfa.first_nation,
+    spouse_id                      INT            NULL REFERENCES sfa.person,
+    parent1_id                     INT            NULL REFERENCES sfa.person,
+    parent2_id                     INT            NULL REFERENCES sfa.person,
+    parent1_income                 NUMERIC(10, 2) NULL,
+    parent1_net_income             NUMERIC(10, 2) NULL,
+    parent1_tax_paid               NUMERIC(10, 2) NULL,
+    parent2_income                 NUMERIC(10, 2) NULL,
+    parent2_net_income             NUMERIC(10, 2) NULL,
+    parent2_tax_paid               NUMERIC(10, 2) NULL,
+    school_email                   NVARCHAR(100)  NULL,
+    school_telephone               NVARCHAR(24)   NULL,
+    spouse_hs_end_year             INT            NULL,
+    spouse_hs_end_month            INT            NULL,
+    spouse_prestudy_emp_status_id  INT            NULL REFERENCES sfa.prestudy_employment_status,
+    spouse_pstudy_school_from      DATE           NULL,
+    spouse_pstudy_school_to        DATE           NULL,
+    spouse_pstudy_income_comment   TEXT           NULL,
+    spouse_study_emp_status_id     INT            NULL REFERENCES sfa.prestudy_employment_status,
+    spouse_study_school_from       DATE           NULL,
+    spouse_study_school_to         DATE           NULL,
+    is_spouse_study_csl            BIT            NOT NULL DEFAULT 0,
+    is_spouse_study_bus            BIT            NOT NULL DEFAULT 0,
+    spouse_study_distance          INT            NULL,
+    spouse_study_income_comment    TEXT           NULL,
+    classes_start_date             DATE           NULL,
+    classes_end_date               DATE           NULL,
+    is_correspondence              BIT            NOT NULL DEFAULT 0,
+    is_coop_paid                   BIT            NOT NULL DEFAULT 0,
+    citizenship_status             INT            NULL REFERENCES sfa.citizenship,
+    is_disabled                    BIT            NOT NULL DEFAULT 0,
+    is_minority                    BIT            NOT NULL DEFAULT 0,
+    student_number                 NVARCHAR(30)   NULL,
+    program_year_total             FLOAT          NULL,
+    program_year                   FLOAT          NULL,
+    is_two_residence               BIT            NOT NULL DEFAULT 0,
+    is_moving                      BIT            NOT NULL DEFAULT 0,
+    csl_classification             INT            NULL REFERENCES sfa.csl_classification,
+    csl_previous_province_id       INT            NULL REFERENCES sfa.province,
+    program_division_explanation   NVARCHAR(200)  NULL,
+    prestudy_accom_code            INT            NULL,
+    prestudy_own_home              BIT            NOT NULL DEFAULT 0,
+    prestudy_board_amount          NUMERIC(10, 2) NULL,
+    prestudy_city_id               INT            NULL REFERENCES sfa.city,
+    prestudy_province_id           INT            NULL REFERENCES sfa.province,
+    prestudy_bus                   BIT            NOT NULL DEFAULT 0,
+    prestudy_distance              INT            NULL,
+    prestudy_employ_status_id      INT            NULL REFERENCES sfa.prestudy_employment_status,
+    study_accom_code               INT            NULL,
+    study_own_home                 BIT            NOT NULL DEFAULT 0,
+    study_board_amount             NUMERIC(10, 2) NULL,
+    study_city_id                  INT            NULL REFERENCES sfa.city,
+    study_province_id              INT            NULL REFERENCES sfa.province,
+    study_bus                      BIT            NOT NULL DEFAULT 0,
+    study_distance                 INT            NULL,
+    stat_info_comment              NVARCHAR(500)  NULL,
+    books_supplies_cost            INT            NULL,
+    outstanding_cslpt_amount       NUMERIC(10, 2) NULL,
+    previous_csg_pt_amount         NUMERIC(10, 2) NULL,
+    percent_of_full_time           INT            NULL,
+    is_part_of_ft                  BIT            NOT NULL DEFAULT 0,
+    study_weeks_count              INT            NULL,
+    class_hours_per_week           NUMERIC(4, 1)  NULL,
+    parent_residence_comment       NVARCHAR(500)  NULL,
+    study_living_w_spouse          BIT            NOT NULL DEFAULT 0,
+    prestudy_living_w_spouse       BIT            NOT NULL DEFAULT 0,
+    tuition_estimate_amount        NUMERIC(10, 2) NULL,
+    program_division               INT            NULL REFERENCES sfa.program_division,
+    is_previous_cslft              BIT            NOT NULL DEFAULT 0,
+    is_previous_cslpt              BIT            NOT NULL DEFAULT 0,
+    coop_start_year                INT            NULL,
+    coop_start_month               INT            NULL,
+    coop_end_year                  INT            NULL,
+    coop_end_month                 INT            NULL,
+    exclude_from_count             BIT            NOT NULL DEFAULT 0,
+    is_perm_disabled               BIT            NOT NULL DEFAULT 0,
+    disabled_equipment             NVARCHAR(500)  NULL,
+    previous_csg_disability_amount NUMERIC(10, 2) NULL,
+    previous_csg_fem_doc_amount    NUMERIC(10, 2) NULL,
+    credit_chk_reqd_date           DATE           NULL,
+    credit_chk_fax_sent_date       DATE           NULL,
+    credit_chk_passed_date         DATE           NULL,
+    credit_chk_passed              BIT            NOT NULL DEFAULT 0,
+    credit_chk_appeal_date         DATE           NULL,
+    credit_chk_app_comp_date       DATE           NULL,
+    credit_chk_app_comp            BIT            NOT NULL DEFAULT 0,
+    credit_chk_comp_date           DATE           NULL,
+    csl_clearance_date             DATE           NULL,
+    prestudy_csl_classification    INT            NULL REFERENCES sfa.csl_classification,
+    yea_tot_receipt_amount         NUMERIC(10, 2) NULL,
+    academic_percent               FLOAT          NULL,
+    csl_restriction_comment        NVARCHAR(2000) NULL,
+    in_progress_page               INT            NULL,
+    online_start_date              DATE           NULL,
+    online_submit_date             DATE           NULL,
+    rem_transition_grant_years     INT            NULL,
+    student_ln150_income           NUMERIC(10, 2) NULL,
+    spouse_ln150_income            NUMERIC(10, 2) NULL,
+    taxes1_filed_year              INT            NULL,
+    taxes2_filed_year              INT            NULL,
+    taxes1_filed_province_id       INT            NULL REFERENCES sfa.province,
+    taxes2_filed_province_id       INT            NULL REFERENCES sfa.province,
+    taxes1_not_filed               BIT            NOT NULL DEFAULT 0,
+    taxes2_not_filed               BIT            NOT NULL DEFAULT 0,
+    taxes1_verified                BIT            NOT NULL DEFAULT 0,
+    taxes2_verified                BIT            NOT NULL DEFAULT 0,
+    applied_other_funding          BIT            NOT NULL DEFAULT 0,
+    csl_restriction_warn_id        INT            NULL REFERENCES sfa.csl_code,
+    csl_restriction_reason_id      INT            NULL REFERENCES sfa.csl_code,
+    courses_per_week               INT            NULL,
+    prestudy_start_date            DATE           NULL,
+    prestudy_end_date              DATE           NULL,
+    valid_driver_license           BIT            NULL,
+    valid_driver_license_comment   TEXT           NULL,
+    valid_yhcip                    BIT            NULL,
+    valid_yhcip_comment            TEXT           NULL,
+    attendance_id                  INT            NULL REFERENCES sfa.attendance,
+    has_consent_to_share_data      BIT            NOT NULL DEFAULT 0,
+    permanent_disability           BIT            NOT NULL DEFAULT 0,
+    pers_or_prolong_disability     BIT            NOT NULL DEFAULT 0,
+    disability_start_date          DATE           NULL,
+    requires_credit_check          BIT            NOT NULL DEFAULT 0,
+    last_checked_on                DATE           NULL
+
+)
+
+CREATE TABLE sfa.income (
+	id INT IDENTITY (1,1) PRIMARY KEY,
+	application_id INT NOT NULL REFERENCES sfa.application,
+	income_type_id INT NULL REFERENCES sfa.income_type,
+	comment TEXT NULL,
+    amount NUMERIC NULL
 )
 
 CREATE TABLE sfa.agency_assistance
@@ -1220,7 +1266,7 @@ CREATE TABLE sfa.dependent_eligibility
     id                     INT IDENTITY PRIMARY KEY,
     application_id         INT  NOT NULL REFERENCES sfa.application,
     dependent_id           INT  NOT NULL REFERENCES sfa.dependent,
-    is_eligible            BIT  NOT NULL DEFAULT 0,
+    is_sta_eligible        BIT  NOT NULL DEFAULT 0,
     is_post_secondary      BIT  NOT NULL DEFAULT 0,
     resides_with_student   BIT  NOT NULL DEFAULT 0,
     is_shares_custody      BIT  NOT NULL DEFAULT 0,
@@ -1235,14 +1281,37 @@ CREATE TABLE sfa.disability
     id                 INT IDENTITY PRIMARY KEY,
     application_id     INT           NOT NULL REFERENCES sfa.application,
     disability_type_id INT           NOT NULL REFERENCES sfa.disability_type,
-    description        NVARCHAR(100) NULL
+    description        NVARCHAR(100) NULL,
+    verified_disability_need BIT     NOT NULL DEFAULT 0
 )
 
 CREATE TABLE sfa.disability_requirement
 (
     id                    INT IDENTITY PRIMARY KEY,
     application_id        INT NOT NULL REFERENCES sfa.application,
-    disability_service_id INT NOT NULL REFERENCES sfa.disability_service
+    disability_service_id INT NOT NULL REFERENCES sfa.disability_service,
+    requested_amount      NUMERIC(10, 2) NULL,
+    max_allowed_amount    NUMERIC(10, 2) NULL,
+    approve_amount        NUMERIC(10, 2) NULL,
+    verified_service_need BIT NOT NULL DEFAULT 0
+)
+
+CREATE TABLE sfa.equipment_category
+(
+    id                 INT IDENTITY PRIMARY KEY,
+    description        NVARCHAR(100) NOT NULL,
+    is_active          BIT NOT NULL DEFAULT 1
+)
+
+CREATE TABLE sfa.equipment_required
+(
+    id                    INT IDENTITY PRIMARY KEY,
+    application_id        INT NOT NULL REFERENCES sfa.application,
+    equipment_category_id INT NOT NULL REFERENCES sfa.equipment_category,
+    requested_amount      NUMERIC(10, 2) NULL,
+    max_allowed_amount    NUMERIC(10, 2) NULL,
+    approve_amount        NUMERIC(10, 2) NULL,
+    verified_equipment_need BIT NOT NULL DEFAULT 0
 )
 
 CREATE TABLE sfa.expense
@@ -1271,6 +1340,7 @@ CREATE TABLE sfa.funding_request
     csl_request_amount NUMERIC(10, 2) NULL,
     is_csl_full_amount BIT            NULL     DEFAULT 0,
     is_csg_only        BIT            NOT NULL DEFAULT 0,
+    entering_first_year                     BIT            NULL DEFAULT 0,
     student_meet_hs_o_equiv_req             BIT            NULL DEFAULT 0,
     student_meet_residency_req              BIT            NULL DEFAULT 0,
     student_isnt_elig_f_fund_in_another_jur BIT            NULL DEFAULT 0,
@@ -1449,11 +1519,11 @@ CREATE TABLE sfa.assessment
     pstudy_day_care_actual         FLOAT          NULL,
     student_gross_income           FLOAT          NULL,
     spouse_gross_income            FLOAT          NULL,
-    prestudy_csl_classification    FLOAT          NULL REFERENCES sfa.csl_classification,
+    prestudy_csl_classification    INT            NULL REFERENCES sfa.csl_classification,
     marital_status_id              INT            NULL REFERENCES sfa.marital_status,
     spouse_province_id             INT            NULL REFERENCES sfa.province,
     study_accom_code               FLOAT          NULL,
-    csl_classification             FLOAT          NULL REFERENCES sfa.csl_classification,
+    csl_classification             INT            NULL REFERENCES sfa.csl_classification,
     family_size                    FLOAT          NULL,
     parent_ps_depend_count         FLOAT          NULL,
     parent_province                VARCHAR(100)   NULL,
@@ -1464,6 +1534,7 @@ CREATE TABLE sfa.assessment
     prestudy_bus_flag              FLOAT          NULL,
     study_bus_flag                 FLOAT          NULL,
     study_living_w_spouse_flag     FLOAT          NULL,
+    prestudy_living_w_spouse_flag  FLOAT          NULL,
     csl_full_amt_flag              FLOAT          NULL,
     study_area_id                  INT            NULL REFERENCES sfa.study_area,
     program_id                     INT            NULL REFERENCES sfa.program,
@@ -1708,6 +1779,16 @@ CREATE TABLE sfa.entitlement_error
     is_resend                 BIT NOT NULL DEFAULT 0
 )
 
+CREATE TABLE sfa.application_draft (
+  id INT IDENTITY(1,1) PRIMARY KEY,
+  student_id INT NOT NULL REFERENCES sfa.student,
+  academic_year_id INT NOT NULL REFERENCES sfa.academic_year,
+  create_date DATETIME2(0) NOT NULL DEFAULT GETDATE(),
+  update_date DATETIME2(0) NOT NULL DEFAULT GETDATE(),
+  is_active BIT DEFAULT 1,
+  application_json TEXT NOT NULL
+)
+
 CREATE TABLE sfa.file_reference (
 	object_key VARCHAR(21) PRIMARY KEY,
 	object_key_pdf VARCHAR(21) UNIQUE null,
@@ -1715,11 +1796,42 @@ CREATE TABLE sfa.file_reference (
 	upload_date DATETIME2(0) NOT NULL,
 	upload_source VARCHAR(50) NOT NULL,
     student_id INT NOT NULL REFERENCES sfa.student,
-    application_id INT NOT NULL REFERENCES sfa.application,
+    application_id INT NULL REFERENCES sfa.application,
+    application_draft_id INT NULL REFERENCES sfa.application_draft,
+    requirement_type_id INT NOT NULL REFERENCES sfa.requirement_type,
+    person_id INT NULL REFERENCES sfa.person,
+    dependent_id INT NULL REFERENCES sfa.dependent,
+    disability_requirement_id INT NULL REFERENCES sfa.disability_requirement,
     status VARCHAR(50) NOT NULL,
     status_date DATETIME2(0) NOT NULL,
     bucket VARCHAR(50) NOT NULL,
     file_name NVARCHAR(200) NOT NULL,
     mime_type NVARCHAR(100) NOT NULL,
+    comment TEXT NULL,
     file_size BIGINT NOT NULL
+)
+
+CREATE TABLE sfa.student_auth (
+  id INT IDENTITY(1,1) PRIMARY KEY,
+  student_id INT NOT NULL REFERENCES sfa.student,
+  sub NVARCHAR(100) NOT NULL UNIQUE,
+  create_date DATETIME2(0) NOT NULL DEFAULT GETDATE(),
+  is_active BIT DEFAULT 1
+)
+
+CREATE TABLE sfa.vendor_update (
+	id INT IDENTITY(1,1) PRIMARY KEY,
+	address NVARCHAR(200) NULL,
+	city_id INT NULL REFERENCES sfa.city,
+	province_id INT NULL REFERENCES sfa.province,
+	postal_code NVARCHAR(50) NULL,
+	country_id INT NULL REFERENCES sfa.country,
+	telephone NVARCHAR(24)  NULL,
+    email NVARCHAR(100) NULL,
+    address_type_id INT NOT NULL REFERENCES sfa.address_type,
+    vendor_id NVARCHAR(25) NOT NULL,
+    created_date DATE NOT NULL DEFAULT GETDATE(),
+    update_requested_date DATE NULL,
+    update_completed_date DATE NULL,
+    student_id INT NOT NULL REFERENCES sfa.student
 )
