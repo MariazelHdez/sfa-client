@@ -508,7 +508,7 @@ BEGIN
 END
 GO
 
-CREATE OR ALTER FUNCTION get_total_funded_years (
+CREATE OR ALTER FUNCTION fn_get_total_funded_years (
 	@student_id_p FLOAT(53)
 	,@application_id_p FLOAT(53)
 	)
