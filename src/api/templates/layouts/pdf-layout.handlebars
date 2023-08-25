@@ -8,15 +8,15 @@
     <style type="text/css">
         @page {
             /* magic tag that affects Puppeteer page formatting. See preferCSSPageSize  */
-            margin: 20mm;
+            margin: 5mm 10mm 5mm;
         }
 
         /* Example CSS Styling */
         body {
             font-family: Calibri;
-            font-size: 12pt;
+            font-size: 11pt;
             line-height: 1.2;
-            margin: 50px;
+            margin: 30px;
             color: #000;
         }
 
@@ -88,6 +88,7 @@
 </head>
 
 <body>
+    <img src="http://localhost:{{API_PORT}}/yukon-logo.png" style="height: 80px; width: 160px; margin-left: -10px" />
     <div>
         {{{body}}}
     </div>

@@ -15,11 +15,17 @@
 
       <h1>Funding Status</h1>
     </div>
-    <div class="col-md-12"  v-if="!assessmentComponent && showFundings">
-      <v-card class="default mb-5" v-for="item, index in application.funding_requests" :key="index">
+    <div class="col-md-12" v-if="!assessmentComponent && showFundings">
+      <v-card class="default mb-5" v-for="(item, index) in application.funding_requests" :key="index">
         <v-card-text>
           <div class="row">
-            <div class="col-md-4" :title="fundingTypeOptions?.find(ft => ft.REQUEST_TYPE_ID === item?.request_type_id)?.DESCRIPTION || 'Funding Status' ">
+            <div
+              class="col-md-4"
+              :title="
+                fundingTypeOptions?.find((ft) => ft.REQUEST_TYPE_ID === item?.request_type_id)?.DESCRIPTION ||
+                  'Funding Status'
+              "
+            >
               <v-select
                 disabled
                 outlined
@@ -68,12 +74,8 @@
               </v-menu>
             </div>
             <div class="col-md-3">
-              <v-btn 
-                :disabled="
-                  !(item?.status_id === 6 
-                  || item?.status_id === 7 
-                  || item?.status_id === 40)
-                "
+              <v-btn
+                :disabled="!(item?.status_id === 6 || item?.status_id === 7 || item?.status_id === 40)"
                 dense
                 color="blue"
                 class="my-0"
@@ -82,19 +84,12 @@
               >
                 Assessment
               </v-btn>
-          </div>
+            </div>
             <div class="col-md-3">
-              <v-btn 
-                :disabled="showAdd"
-                dense
-                color="success" 
-                class="my-0"
-                block
-              >
-                  Print Letter
+              <v-btn :disabled="showAdd" dense color="success" class="my-0" block @click="printLetterClick(item)">
+                Print Letter
               </v-btn>
-          </div>
-            
+            </div>
           </div>
           <div class="row">
             <div class="col-md-4">
@@ -162,19 +157,17 @@
               ></v-autocomplete>
             </div>
           </div>
-
         </v-card-text>
       </v-card>
     </div>
-    <component 
-      v-if="assessmentComponent && !showFundings && assessmentTypeId" 
-      :is="assessmentComponent" 
+    <component
+      v-if="assessmentComponent && !showFundings && assessmentTypeId"
+      :is="assessmentComponent"
       :fundingRequestId="fundingRequestId"
-      v-on:close="showFundingStatus" 
+      v-on:close="showFundingStatus"
       v-on:showError="showError"
       v-on:showSuccess="showSuccess"
     ></component>
-    
   </div>
 </template>
 
@@ -188,17 +181,17 @@ import {
   FUNDING_TYPE_URL,
   FUNDING_STATUS_URL,
   FUNDING_REASON_URL,
-  APPLICATION_URL
+  APPLICATION_URL,
+  APPLICATION_LETTER_URL,
 } from "../../urls";
-import { mapGetters } from 'vuex';
+import { mapGetters } from "vuex";
 
 export default {
   name: "application-status",
-  components: {
-  },
+  components: {},
   computed: {
-    ...mapGetters(['assessments']),
-    application: function () {
+    ...mapGetters(["assessments"]),
+    application: function() {
       return store.getters.selectedApplication;
     },
   },
@@ -221,7 +214,7 @@ export default {
       status_date: null,
       status_date_menu: false,
       received_date_menu: false,
-      assessmentsComponents: {}
+      assessmentsComponents: {},
     },
   }),
   async created() {
@@ -239,16 +232,16 @@ export default {
   methods: {
     async assessmentTypeC() {
       this.assessmentComponent = await assessmentType(
-        this.assessmentTypeId, 
-        this.application.id, 
-        this.fundingRequestId, 
-        this.application.academic_year_id, 
+        this.assessmentTypeId,
+        this.application.id,
+        this.fundingRequestId,
+        this.application.academic_year_id,
         this
       );
     },
     showAssessment(request_type_id, funding_request_id) {
       this.showFundings = false;
-      store.dispatch('getAssessments', { application_id: this.application.id, funding_request_id });
+      store.dispatch("getAssessments", { application_id: this.application.id, funding_request_id });
       this.assessmentTypeId = request_type_id;
       this.fundingRequestId = funding_request_id;
       this.assessmentTypeC();
@@ -273,17 +266,17 @@ export default {
     },
     setClose() {
       this.newRecord = {
-      request_type_id: null,
-      received_date: null,
-      status_id: null,
-      status_reason_id: null,
-      status_date: null,
-      status_date_menu: false,
-      received_date_menu: false,
-    };
+        request_type_id: null,
+        received_date: null,
+        status_id: null,
+        status_reason_id: null,
+        status_date: null,
+        status_date_menu: false,
+        received_date_menu: false,
+      };
       this.showAdd = !this.showAdd;
     },
-    assessmentLoadForm: function (items) {
+    assessmentLoadForm: function(items) {
       console.log("Value: ", items.request_type_id);
     },
     loadRequirementTypes() {
@@ -298,7 +291,7 @@ export default {
     },
     loadStatus() {
       axios.get(FUNDING_STATUS_URL).then((resp) => {
-        this.statusOptions = resp.data; 
+        this.statusOptions = resp.data;
       });
     },
     loadReasons() {
@@ -308,17 +301,16 @@ export default {
     },
     async updateFundingRequest(itemToUpdate, id) {
       try {
-        const resInsert = await axios.put(
-            APPLICATION_URL+`/${this.applicationId}/status/${id}`,
-            { data: { ...itemToUpdate } },
-          );
-          const message = resInsert?.data?.messages[0];
+        const resInsert = await axios.put(APPLICATION_URL + `/${this.applicationId}/status/${id}`, {
+          data: { ...itemToUpdate },
+        });
+        const message = resInsert?.data?.messages[0];
 
-          if (message?.variant === "success") {
-            this.$emit("showSuccess", message.text);
-          } else {
-            this.$emit("showError", message.text);
-          }
+        if (message?.variant === "success") {
+          this.$emit("showSuccess", message.text);
+        } else {
+          this.$emit("showError", message.text);
+        }
       } catch (error) {
         this.$emit("showError", "Error to update");
       } finally {
@@ -331,11 +323,20 @@ export default {
     showError(mgs) {
       this.$emit("showError", mgs);
     },
+    printLetterClick(item) {
+      let approvalLetterUrl = `${APPLICATION_LETTER_URL}/${this.applicationId}/approval/${item.id}`;
+
+      window.open(approvalLetterUrl);
+
+      /* axios.get(approvalLetterUrl, { responseType: "blob" }).then((resp) => {
+        window.open(URL.createObjectURL(resp.data));
+      }); */
+    },
   },
 };
 </script>
 <style>
-.v-select__selection.v-select__selection--comma.v-select__selection--disabled{
-  color:rgba(0,0,0,.87)!important;
+.v-select__selection.v-select__selection--comma.v-select__selection--disabled {
+  color: rgba(0, 0, 0, 0.87) !important;
 }
 </style>
