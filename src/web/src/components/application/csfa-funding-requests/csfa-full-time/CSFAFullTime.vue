@@ -273,24 +273,6 @@ export default {
 
             return request || {};
         },
-        GrantFullTimeDisabilities: function () {
-            const request = this.application
-                ?.funding_requests
-                ?.find(fr => fr.request_type_id === 29);
-
-            //this.checkGrantFullTimeRequest = !!request;
-
-            return request || {};
-        },
-        GrantFullTimeDependents: function () {
-            const request = this.application
-                ?.funding_requests
-                ?.find(fr => fr.request_type_id === 32);
-
-            //this.checkGrantFullTimeRequest = !!request;
-
-            return request || {};
-        },
         GrantTopUpFullTimeRequest: function () {
             const request = this.application
                 ?.funding_requests
@@ -348,17 +330,11 @@ export default {
                     if(this.CSFAFullTimeRequest?.id){
                         this.deleteRecord(this.CSFAFullTimeRequest.id);
                     }
-                    if(this.GrantTopUpFullTimeRequest?.id){
-                        this.deleteRecord(this.GrantTopUpFullTimeRequest.id);
-                    }
                     if(this.GrantFullTimeRequest?.id){
                         this.deleteRecord(this.GrantFullTimeRequest.id);
                     }
-                    if(this.GrantFullTimeDependents?.id){
-                        this.deleteRecord(this.GrantFullTimeDependents.id);
-                    }
-                    if(this.GrantFullTimeDisabilities?.id){
-                        this.deleteRecord(this.GrantFullTimeDisabilities.id);
+                    if(this.GrantTopUpFullTimeRequest?.id){
+                        this.deleteRecord(this.GrantTopUpFullTimeRequest.id);
                     }
                 },
                 () => {
@@ -373,13 +349,6 @@ export default {
                     APPLICATION_URL+`/${this.application.id}/status`,
                     { request_type_id: type, received_date: new Date(),},
                 );
-
-                if (typeTwo === 35 || typeTwo === 28) {
-                    const resInsert = await axios.post(
-                        APPLICATION_URL+`/${this.application.id}/status`,
-                        { request_type_id: typeTwo, received_date: new Date(),},
-                    ); 
-                }
 
                 const message = resInsert?.data?.messages[0];
 
@@ -422,42 +391,28 @@ export default {
             } else {
                 if (!this.CSFAFullTimeRequest?.id) {
                     this.addFundingRequest(4);
-                    this.addFundingRequest(28, 35);
-                    this.addFundingRequest(29);
-                    this.addFundingRequest(32);
+                }
+                if (!this.GrantFullTimeRequest?.id) {
+                    this.addFundingRequest(35);
+                }
+                if (!this.GrantTopUpFullTimeRequest?.id) {
+                    this.addFundingRequest(28);
                 }
             }
         },
         toggleForBoth(event, requestType = "") {
-            if (event && (!this.GrantFullTimeRequest?.id && !this.GrantTopUpFullTimeRequest?.id)) {
-                if (requestType === "is_csl_full_amount") {
+            if (requestType === "is_csl_full_amount") {
                 this.updateFundingRequest({
-                        is_csl_full_amount: this.CSFAFullTimeRequest.is_csl_full_amount
-                    }, this.CSFAFullTimeRequest.id);
-                }
-                if (requestType === "is_csg_only") {
-                    this.updateFundingRequest({
-                        is_csg_only: this.CSFAFullTimeRequest.is_csg_only
-                    }, this.CSFAFullTimeRequest.id);
-                }
-            }else if (
-                event && (!!this.GrantFullTimeRequest?.id && !!this.GrantTopUpFullTimeRequest?.id)
-                || !event && (!this.GrantFullTimeRequest?.id && !this.GrantTopUpFullTimeRequest?.id)
-            ) {
-                if (requestType === "is_csl_full_amount") {
-                    this.updateFundingRequest({
-                        is_csl_full_amount: this.CSFAFullTimeRequest.is_csl_full_amount
-                    }, this.CSFAFullTimeRequest.id);
-                }
-                if (requestType === "is_csg_only") {
-                    this.updateFundingRequest({
-                        is_csg_only: this.CSFAFullTimeRequest.is_csg_only
-                    }, this.CSFAFullTimeRequest.id);
-                }
+                    is_csl_full_amount: this.CSFAFullTimeRequest.is_csl_full_amount
+                }, this.CSFAFullTimeRequest.id);
             }
-            
-            
-       },
+
+            if (requestType === "is_csg_only") {
+                this.updateFundingRequest({
+                    is_csg_only: this.CSFAFullTimeRequest.is_csg_only
+                }, this.CSFAFullTimeRequest.id);
+            }
+        },
     },
 };
 </script>
