@@ -56,7 +56,7 @@ cslMsfaaSendRouter.get("/:EXPORT_DATE/:SEQ_NUM/:FLAG",
                 .select(db.raw("'200' as record_type"), "agreement_num_init", "agreement_number", "sin", db.raw("'P' as status_code"), "institution_code", "date_of_birth", "date_produced", "last_name", "first_name", "initials", "gender", "marital_status", "home_address1", "home_address2", "home_city", "home_province", "home_province_id", "home_postal_code", "home_country", "home_phone", "home_email", "mailing_address1", "mailing_address2", "mailing_city", "mailing_province", "mailing_province_id", "mailing_postal_code", "mailing_country", "school_phone", "school_email", "sent_date", "sent_seq_number", "part_full_time")
                 .whereNull("sent_date")
                 .andWhere("msfaa_status", "=", "Pending")      	
-                v_rec_count = await db("sfa.vw_msfaa_send").select(db.raw("COUNT(*)")).whereNull("sent_date").andWhere("msfaa_status", "=", "Pending");	
+                v_rec_count = await db("sfa.vw_msfaa_send").select(db.raw("COUNT(*) AS count")).whereNull("sent_date").andWhere("msfaa_status", "=", "Pending");                                
                 
                 if(v_rec_count[0].count < 1) {                    
                     badMessage =  ' There are no MSFAAs to Send, Header and Trailer still written'; 
@@ -101,7 +101,8 @@ cslMsfaaSendRouter.get("/:EXPORT_DATE/:SEQ_NUM/:FLAG",
                         }
 
                         v_out_record = 
-						v_out_record +
+						v_out_record +     
+                        '\n'  +
                         '200' +
                         (col.agreement_num_init ? col.agreement_num_init :  '').toString().padStart(1, '0') +
                         (col.agreement_number ? col.agreement_number :  '').toString().padStart(9, '0') +
@@ -131,15 +132,17 @@ cslMsfaaSendRouter.get("/:EXPORT_DATE/:SEQ_NUM/:FLAG",
                         (col.home_country ? col.home_country : ' ').substring(0, 20).padEnd(20, ' ') +
                         (v_home_phone ? v_home_phone : ' ').padStart(20, '0') +
                         (col.part_full_time ? col.part_full_time :  'FT').padEnd(2, ' ') +
-                        ' '.padEnd(110, ' ');
+                        ' '.padEnd(110, ' ');                        
 
                         v_count = v_count + 1;
                         v_total_sin = v_total_sin + (col.sin ? col.sin : '');
-                						
-                        let sp_msfaa_send = await db.raw(`EXEC sfa.sp_update_msfa_send ${nextVal[0].nextVal}, ${col.agreement_number ? col.agreement_number : -1};`);  						             
-                    }								
-					const exec_insert_communication_log_from_msfaa = await db.raw(`EXEC sfa.sp_insert_communication_log_from_msfaa ${SEQ_NUM}`);
+                		
+                        let sp_msfaa_send = await db.raw(`EXEC sfa.sp_update_msfa_send ${nextVal[0].nextVal}, ${col.agreement_number ? col.agreement_number : -1};`);
+                    }		
+					
+					const exec_insert_communication_log_from_msfaa = await db.raw(`EXEC sfa.sp_insert_communication_log_from_msfaa ${SEQ_NUM}`);                    
                 }
+                
 			} else {	
                 msfaa_view_select = await db("sfa.vw_msfaa_send")
                 .select(db.raw("'200' as record_type"), "agreement_num_init", "agreement_number", "sin", db.raw("'P' as status_code"), "institution_code", "date_of_birth", "date_produced", "last_name", "first_name", "initials", "gender", "marital_status", "home_address1", "home_address2", "home_city", "home_province", "home_province_id", "home_postal_code", "home_country", "home_phone", "home_email", "mailing_address1", "mailing_address2", "mailing_city", "mailing_province", "mailing_province_id", "mailing_postal_code", "mailing_country", "school_phone", "school_email", "sent_date", "sent_seq_number", "part_full_time")
@@ -188,6 +191,7 @@ cslMsfaaSendRouter.get("/:EXPORT_DATE/:SEQ_NUM/:FLAG",
 
 					v_out_record = 
 					v_out_record + 
+                    '\n' +
 					'200' +
 					(col.agreement_num_init ? col.agreement_num_init :  '').toString().padStart(1, '0') +
 					(col.agreement_number ? col.agreement_number :  '').toString().padStart(9, '0') +
@@ -217,32 +221,27 @@ cslMsfaaSendRouter.get("/:EXPORT_DATE/:SEQ_NUM/:FLAG",
 					(col.home_country ? col.home_country : ' ').substring(0, 20).padEnd(20, ' ') +
 					(v_home_phone ? v_home_phone : ' ').padStart(20, '0') +
 					(col.part_full_time ? col.part_full_time : 'FT').padEnd(2, ' ') +
-					' '.padEnd(112, ' ');
+					' '.padEnd(112, ' ')                    
 
 					v_count = v_count + 1;
 					v_total_sin = v_total_sin + (col.sin ? col.sin : 0);
-								
-					let sp_msfaa_send = await db.raw(`EXEC sfa.sp_update_date_msfa_send ${nextVal[0].nextVal}, '${moment(v_send_date, 'YYYYMMDD').format('YYYY-MM-DD')}', ${col.agreement_number ? col.agreement_number : -1};`);  
+						
+					let sp_msfaa_send = await db.raw(`EXEC sfa.sp_update_date_msfa_send ${nextVal[0].nextVal}, '${moment(v_send_date, 'YYYYMMDD').format('YYYY-MM-DD')}', ${col.agreement_number ? col.agreement_number : -1};`);
 				}
 			}
 
-			v_out_record = v_out_record + '999' + 'MSFAA SENT'.padEnd(40, ' ') + String(v_count).padStart(9, '0') + String(v_total_sin).padStart(15, '0') + ' '.padEnd(533, ' ');
+			v_out_record = v_out_record + '\n' + '999' + 'MSFAA SENT'.padEnd(40, ' ') + String(v_count).padStart(9, '0') + String(v_total_sin).padStart(15, '0') + ' '.padEnd(533, ' ');
 			
-			let sp_system_parameter_send = await db.raw(`EXEC sfa.sp_update_system_parameter_send '${moment(new Date).format('YYYY-MM-DD HH:ss')}', ${nextVal[0].nextVal};`);   			
-			
+			let sp_system_parameter_send = await db.raw(`EXEC sfa.sp_update_system_parameter_send '${moment(new Date).format('YYYY-MM-DD HH:ss')}', ${nextVal[0].nextVal};`);   						
+
 			okMessage = 'MSFAA export complete. ' + v_filename + ' has been saved.  ' + v_email_sent;
             
 			nextVal = await db.select(db.raw(`NEXT VALUE FOR sfa.msfaa_sent_seq AS nextVal;`));  
 			EXPORT_DATE = "";
             
-			return res.json({flag: !badMessage ? 1 : 0, data: v_out_record, message: (badMessage ? badMessage + ". " : "") + okMessage, filename: v_filename}); 
-
-
-                               
+			return res.json({flag: !badMessage ? 1 : 0, data: v_out_record, message: (badMessage ? badMessage + ". " : "") + okMessage, filename: v_filename});
         } catch (error: any) {
             console.log(error);
             return res.status(404).send();
         }   		  
 });
-
-
