@@ -371,7 +371,7 @@ cslEntitlementFeedbackRouter.post("/:FILE_NAME", [param("FILE_NAME").notEmpty()]
 								console.log(error);
 								return res.json({flag: 0, data: 'Something went wrong, please contact the administrator. 0'});
 							}														
-							vTotalSin = vTotalSin + vNumSin;
+							vTotalSin = vTotalSin + Number(vNumSin ?? 0);
 							vRejectedCount = vRejectedCount + 1;											
                         } else if(currentLine.substring(0, 1).toUpperCase() === "T") {							
 							vAcceptedTot = Number(currentLine.substring(1, 10).replaceAll(' ', ''));

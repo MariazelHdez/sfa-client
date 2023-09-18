@@ -156,7 +156,7 @@ cslMsfaaReceiveRouter.post("/:FILE_NAME",
                             `);
                             
                             vCount = vCount + 1;
-                            vTotalSin = vTotalSin + vNumSin;	
+                            vTotalSin = vTotalSin + Number(vNumSin ?? 0);	
                             
                         } else if(headerRecordType === '999') {  
                             if(isNaN(parseInt(currentLine.substring(43, 52).replaceAll(' ', '')))) {
