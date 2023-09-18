@@ -6,7 +6,7 @@ import { DocumentService, DocumentStatus } from "../../services/shared";
 import { ReturnValidationErrors } from "../../middleware";
 import { DB_CONFIG } from "../../config";
 import { Buffer } from "buffer";
-import { functionsIn, indexOf, orderBy, parseInt, min, update, get, isArray } from "lodash";
+import { functionsIn, indexOf, orderBy, parseInt, min, update, get, isArray, some, find } from "lodash";
 import { AssessmentYukonGrant, AssessmentYEA } from "../../repositories/assessment";
 
 const db = knex(DB_CONFIG);
@@ -3057,6 +3057,49 @@ applicationRouter.post(
     }
   }
 );
+
+applicationRouter.post("/validate-funding-request/:application_id",
+  [param("application_id").isInt().notEmpty()],
+  ReturnValidationErrors,
+  async (req: Request, res: Response) => {
+    try {
+      const { application_id } = req.params;
+      //Validate if exist a CSLFT must exist to Grant for Mature Learners Top-Up and Grant for Full-time Students
+      const funding_request = await db("sfa.funding_request")
+                                    .select("request_type_id")
+                                    .select("received_date")
+                                    .where({ application_id: application_id });
+      //Validate if CSLFT exist
+      if(some(funding_request, ['request_type_id', 4])){
+        var fundingCSLFT = find(funding_request, {request_type_id:4})
+        //If exist must have exist funding request for Grant for Mature Learners Top-Up and Grant for Full-time Students
+        if(!some(funding_request, ['request_type_id', 35])){
+          const resInsert = await db("sfa.funding_request").insert({
+            request_type_id: 35,
+            received_date: fundingCSLFT.received_date, 
+            is_csg_only: false,
+            application_id,
+            status_id: 2,
+          });
+        }
+        if(!some(funding_request, ['request_type_id', 28])){
+          const resInsert = await db("sfa.funding_request").insert({
+            request_type_id: 28,
+            received_date: fundingCSLFT.received_date, 
+            is_csg_only: false,
+            application_id,
+            status_id: 2,
+          });
+        }
+      }
+      return res.json({ messages: [{ variant: "success", text: "ok" }], data: [funding_request] });
+    } catch (error) {
+      console.log(error);
+      return res.status(409).send({ messages: [{ variant: "error", text: "Error get data" }] });
+    }
+  }
+);
+
 
 // :assessment.assessed_amount := :assessment.unused_receipts + :assessment.previous_disbursement;
 // NOTE: THIS ALSO IS AFFECTED WHEN A DISBURSEMENT IS ADDED IT; even if it is not saved, you must load it in preview mode.
