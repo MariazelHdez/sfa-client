@@ -204,6 +204,7 @@ export default {
     },
   }),
   async created() {
+    this.validateFundingRequest();
     this.loadRequirementTypes();
     this.loadFundingTypes();
     this.loadStatus();
@@ -231,6 +232,13 @@ export default {
       this.assessmentTypeId = request_type_id;
       this.fundingRequestId = funding_request_id;
       this.assessmentTypeC();
+    },
+    async validateFundingRequest(){
+      axios.post(APPLICATION_URL +  '/validate-funding-request/' + this.$route.params.id).then((resp) => {
+        //the funding request was validated 
+        console.log(resp.data);
+      });
+      
     },
     async showFundingStatus() {
       this.showFundings = true;
